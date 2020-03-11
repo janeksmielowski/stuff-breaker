@@ -12,6 +12,6 @@ data class Item(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "desc") val desc: String?,
     @ColumnInfo(name = "box_id") val boxId: Int,
-    @ColumnInfo(name = "qr_code") val qrCode: String?,
-    @ColumnInfo(name = "image") val image: Image
+    @ColumnInfo(name = "qr_code") val qrCode: String?
+    //@ColumnInfo(name = "image") val image: Image
 )

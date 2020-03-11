@@ -9,5 +9,6 @@ import androidx.room.PrimaryKey
 data class Box(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "qr_code") val qrCode: String?
+    @ColumnInfo(name = "qr_code") val qrCode: String?,
+    @ColumnInfo(name = "parent") val parentId: Int?
 )

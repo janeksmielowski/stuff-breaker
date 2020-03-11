@@ -4,9 +4,9 @@
     tools:context="pl.jansmi.stuffbreaker.MainActivity">
 
     <item
-        android:id="@+id/action_new_folder"
+        android:id="@+id/action_new_box"
         android:orderInCategory="100"
-        android:title="@string/action_new_folder"
+        android:title="@string/action_new_box"
         app:showAsAction="always"
         />
 

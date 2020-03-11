@@ -7,7 +7,7 @@ import pl.jansmi.stuffbreaker.database.entity.Box
 interface BoxDao {
 
     @Query("SELECT * FROM Box WHERE id = :boxId")
-    fun findBoxById(boxId: Int)
+    fun findBoxById(boxId: Int): Box
 
     @Insert
     fun insert(box: Box)
