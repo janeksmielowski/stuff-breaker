@@ -7,8 +7,9 @@ import androidx.room.PrimaryKey
 
 @Entity(indices = [Index(value = ["qr_code"], unique = true)])
 data class Box(
-    @PrimaryKey val id: Int,
-    @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "qr_code") val qrCode: String?,
-    @ColumnInfo(name = "parent") val parentId: Int?
-)
+    @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "qr_code") var qrCode: String?,
+    @ColumnInfo(name = "parent") var parentId: Int?
+) {
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+}

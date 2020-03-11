@@ -8,10 +8,11 @@ import androidx.room.PrimaryKey
 
 @Entity(indices = [Index(value = ["qr_code"], unique = true)])
 data class Item(
-    @PrimaryKey val id: Int,
-    @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "desc") val desc: String?,
-    @ColumnInfo(name = "box_id") val boxId: Int,
-    @ColumnInfo(name = "qr_code") val qrCode: String?
-    //@ColumnInfo(name = "image") val image: Image
-)
+    @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "desc") var desc: String?,
+    @ColumnInfo(name = "box_id") var boxId: Int,
+    @ColumnInfo(name = "qr_code") var qrCode: String?
+    //@ColumnInfo(name = "image") var image: Image
+) {
+    @PrimaryKey(autoGenerate = true) var id: Int = 0
+}
