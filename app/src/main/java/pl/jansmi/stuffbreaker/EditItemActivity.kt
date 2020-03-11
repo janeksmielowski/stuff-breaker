@@ -28,12 +28,18 @@ class EditItemActivity : AppCompatActivity() {
         val boxId: Int = intent.getIntExtra("box", -1)
         var item: Item
 
+        if (boxId == -1) {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+            // return ?
+        }
+
         if (itemId == -1) { // insert new item
-            item = Item(name.text.toString(), desc.text.toString(), boxId, null)
             AsyncTask.execute {
+                item = Item(name.text.toString(), desc.text.toString(), boxId, null)
                 MainActivity.database.items().insert(item)
+                Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
 
         } else { // update item
             AsyncTask.execute {
@@ -42,8 +48,8 @@ class EditItemActivity : AppCompatActivity() {
                 item.desc = desc.text.toString()
                 // TODO item.boxId and item.qrCode
                 MainActivity.database.items().update(item)
+                Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
             }
-            Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
         }
 
         setResult(Activity.RESULT_OK)
