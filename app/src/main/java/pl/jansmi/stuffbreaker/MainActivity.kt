@@ -1,12 +1,17 @@
 package pl.jansmi.stuffbreaker
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -19,6 +24,10 @@ import pl.jansmi.stuffbreaker.database.AppDatabase
 class MainActivity : AppCompatActivity() {
 
     val EDIT_ITEM_REQUEST_CODE = 1
+    val SCANNER_REQUEST_CODE = 2
+    val CAMERA_PERMISSION_REQUEST_CODE = 3
+
+    var cameraPermissionGranted: Boolean = false
 
     companion object {
         lateinit var database: AppDatabase
@@ -33,6 +42,8 @@ class MainActivity : AppCompatActivity() {
             .databaseBuilder(applicationContext, AppDatabase::class.java, "database")
             .build()
 
+        checkPermissions()
+
         add_fab.setOnClickListener {
             val newIntent = Intent(this, EditItemActivity::class.java)
             val boxId = 0 // TODO: fetch box id
@@ -40,7 +51,12 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(newIntent, EDIT_ITEM_REQUEST_CODE)
         }
 
-        // TODO: create fragment with recycler view
+        scan_fab.setOnClickListener {
+            if (this.cameraPermissionGranted) {
+                val newIntent = Intent(this, ScannerActivity::class.java)
+                startActivityForResult(newIntent, SCANNER_REQUEST_CODE)
+            }
+        }
 
     }
 
@@ -55,4 +71,32 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE &&
+            permissions[0].equals(Manifest.permission.CAMERA)) {
+            if (grantResults[0].equals(PackageManager.PERMISSION_GRANTED))
+                this.cameraPermissionGranted = true
+            else
+                Toast.makeText(this, "You will not be able to scan QR codes, until you grant camera permission.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_REQUEST_CODE)
+        } else {
+            this.cameraPermissionGranted = true
+        }
+    }
+
 }

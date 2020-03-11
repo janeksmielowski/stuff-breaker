@@ -47,6 +47,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    // ==== ROOM ==== //
     def room_version = "2.2.4"
 
     implementation "androidx.room:room-runtime:$room_version"
@@ -64,5 +65,8 @@ dependencies {
 
     // Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
+
+    // ==== QR CODE SCANNER ==== //
+    implementation 'me.dm7.barcodescanner:zxing:1.9'
 
 }
