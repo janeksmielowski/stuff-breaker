@@ -7,10 +7,10 @@ import pl.jansmi.stuffbreaker.database.entity.Item
 interface ItemDao {
 
     @Query("SELECT * FROM Item WHERE id = :itemId")
-    fun findItemById(itemId: Int): Item
+    suspend fun findItemById(itemId: Int): Item
 
     @Query("SELECT * FROM Item WHERE box_id = :boxId")
-    fun findAllItemsByBoxId(boxId: Int): List<Item>
+    suspend fun findAllItemsByBoxId(boxId: Int): List<Item>
 
     @Insert
     fun insert(item: Item)

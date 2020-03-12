@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import pl.jansmi.stuffbreaker.adapter.ItemsAdapter
 import pl.jansmi.stuffbreaker.database.AppDatabase
+import pl.jansmi.stuffbreaker.database.entity.Box
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,6 +59,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.localization_fragment, LocalizationFragment(Box("Localizations", null, null)))
+            .commit()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,6 +80,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        // TODO: treat scanned code
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

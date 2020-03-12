@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
+import kotlinx.coroutines.runBlocking
 import pl.jansmi.stuffbreaker.database.entity.Item
 import java.util.*
 
@@ -38,18 +39,18 @@ class EditItemActivity : AppCompatActivity() {
             AsyncTask.execute {
                 item = Item(name.text.toString(), desc.text.toString(), boxId, null)
                 MainActivity.database.items().insert(item)
-                Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
             }
+            Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
 
         } else { // update item
             AsyncTask.execute {
-                item = MainActivity.database.items().findItemById(itemId)
+                item = runBlocking { MainActivity.database.items().findItemById(itemId) }
                 item.name = name.text.toString()
                 item.desc = desc.text.toString()
                 // TODO item.boxId and item.qrCode
                 MainActivity.database.items().update(item)
-                Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
             }
+            Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
         }
 
         setResult(Activity.RESULT_OK)

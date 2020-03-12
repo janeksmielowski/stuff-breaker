@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.runBlocking
 import pl.jansmi.stuffbreaker.MainActivity
 import pl.jansmi.stuffbreaker.R
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
 
-class ItemsAdapter(val boxId: Int): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
+class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
 
     private lateinit var boxes: List<Box>
     private lateinit var items: List<Item>
@@ -29,15 +30,16 @@ class ItemsAdapter(val boxId: Int): RecyclerView.Adapter<ItemsAdapter.ItemHolder
         }
 
         fun bindItem(item: Item) {
-            title.text = "\t${item.name}"
+            // TODO: kind of differentiation for box and item
+            title.text = item.name
         }
 
     }
 
     init {
-        AsyncTask.execute {
-            boxes = MainActivity.database.boxes().findAllBoxesByParentId(boxId)
-            items = MainActivity.database.items().findAllItemsByBoxId(boxId)
+        runBlocking {
+            boxes = MainActivity.database.boxes().findAllBoxesByParentId(box.id)
+            items = MainActivity.database.items().findAllItemsByBoxId(box.id)
         }
     }
 
