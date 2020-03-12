@@ -24,7 +24,7 @@ class EditItemActivity : AppCompatActivity() {
 
     }
 
-    fun saveItemToDatabase() {
+    private fun saveItemToDatabase() {
         val itemId: Int = intent.getIntExtra("item", -1)
         val boxId: Int = intent.getIntExtra("box", -1)
         var item: Item

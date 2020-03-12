@@ -47,11 +47,10 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         var initBox: Box = runBlocking { database.boxes().findBoxById(0) }
-        if (initBox == null) {
+        if (initBox == null)
             currentBox = Box("Localizations", null, null)
-        } else {
+        else
             currentBox = initBox
-        }
 
         checkPermissions()
 
@@ -96,8 +95,7 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE &&
-            permissions[0].equals(Manifest.permission.CAMERA)) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && permissions[0].equals(Manifest.permission.CAMERA)) {
             if (grantResults[0].equals(PackageManager.PERMISSION_GRANTED))
                 this.cameraPermissionGranted = true
             else
