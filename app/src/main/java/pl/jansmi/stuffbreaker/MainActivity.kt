@@ -3,6 +3,7 @@ package pl.jansmi.stuffbreaker
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.AsyncTask
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ import androidx.room.RoomDatabase
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.coroutines.runBlocking
 import pl.jansmi.stuffbreaker.adapter.ItemsAdapter
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     val CAMERA_PERMISSION_REQUEST_CODE = 3
 
     var cameraPermissionGranted: Boolean = false
+    lateinit var currentBox: Box
 
     companion object {
         lateinit var database: AppDatabase
@@ -43,12 +46,18 @@ class MainActivity : AppCompatActivity() {
             .databaseBuilder(applicationContext, AppDatabase::class.java, "database")
             .build()
 
+        var initBox: Box = runBlocking { database.boxes().findBoxById(0) }
+        if (initBox == null) {
+            currentBox = Box("Localizations", null, null)
+        } else {
+            currentBox = initBox
+        }
+
         checkPermissions()
 
         add_fab.setOnClickListener {
             val newIntent = Intent(this, EditItemActivity::class.java)
-            val boxId = 0 // TODO: fetch box id
-            newIntent.putExtra("box", boxId)
+            newIntent.putExtra("box", currentBox.id)
             startActivityForResult(newIntent, EDIT_ITEM_REQUEST_CODE)
         }
 
@@ -61,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.localization_fragment, LocalizationFragment(Box("Localizations", null, null)))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox))
             .commit()
 
     }

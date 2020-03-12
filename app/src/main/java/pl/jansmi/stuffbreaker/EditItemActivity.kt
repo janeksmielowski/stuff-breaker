@@ -32,7 +32,7 @@ class EditItemActivity : AppCompatActivity() {
         if (boxId == -1) {
             setResult(Activity.RESULT_CANCELED)
             finish()
-            // return ?
+            return
         }
 
         if (itemId == -1) { // insert new item
