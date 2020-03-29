@@ -1,25 +1,25 @@
 package pl.jansmi.stuffbreaker.adapter
 
 import android.content.Intent
-import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.marginLeft
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.runBlocking
+import pl.jansmi.stuffbreaker.EditBoxActivity
 import pl.jansmi.stuffbreaker.EditItemActivity
 import pl.jansmi.stuffbreaker.MainActivity
 import pl.jansmi.stuffbreaker.R
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
 
+
 class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
 
-    private lateinit var boxes: List<Box>
-    private lateinit var items: List<Item>
+    private var boxes: List<Box>
+    private var items: List<Item>
 
     // TODO: desc , tags & image
     class ItemHolder(view: View): RecyclerView.ViewHolder(view) {
@@ -38,7 +38,10 @@ class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>(
             desc.text = box.desc
 
             itemView.setOnClickListener {
-
+                val intent = Intent(itemView.context, EditBoxActivity::class.java)
+                intent.putExtra("box", box.id)
+                intent.putExtra("parent", box.parentId)
+                itemView.context.startActivity(intent)
             }
         }
 
@@ -48,10 +51,8 @@ class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>(
             // TODO: image.setImageResource()
             // custom icon if no image provided
             image.setImageResource(R.drawable.ic_baseline_crop_square_64)
-            image.marginLeft.plus(10)
 
             itemView.setOnClickListener {
-                Log.i("OKOK", "okok")
                 val intent = Intent(itemView.context, EditItemActivity::class.java)
                 intent.putExtra("box", item.boxId)
                 intent.putExtra("item", item.id)
@@ -82,7 +83,7 @@ class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>(
             val box: Box = boxes[position]
             holder.bindBox(box)
         } else {
-            val item: Item = items[position]
+            val item: Item = items[position - boxes.size]
             holder.bindItem(item)
         }
     }
