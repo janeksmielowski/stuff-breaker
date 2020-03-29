@@ -12,7 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ScannerActivity"></activity>
+        <activity android:name=".ScannerActivity" />
+        <activity
+            android:name=".EditBoxActivity"
+            android:label="@string/title_activity_edit_box"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditItemActivity"
             android:label="@string/title_activity_edit_item"
