@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.set
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
@@ -15,25 +16,36 @@ import java.util.*
 
 class EditItemActivity : AppCompatActivity() {
 
+    private var itemId: Int = -1
+    private var boxId: Int = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_item)
         setSupportActionBar(toolbar)
 
-        submit_btn.setOnClickListener { saveItemToDatabase() }
-
-    }
-
-    private fun saveItemToDatabase() {
-        val itemId: Int = intent.getIntExtra("item", -1)
-        val boxId: Int = intent.getIntExtra("box", -1)
-        var item: Item
+        itemId = intent.getIntExtra("item", -1)
+        boxId = intent.getIntExtra("box", -1)
 
         if (boxId == -1) {
             setResult(Activity.RESULT_CANCELED)
             finish()
             return
         }
+
+        if (itemId != -1) {
+            val item = MainActivity.database.items().findItemById(itemId)
+            titleBox.setText("Edit item")
+            name.setText(item.name)
+            desc.setText(item.desc)
+        }
+
+        submit_btn.setOnClickListener { saveItemToDatabase() }
+
+    }
+
+    private fun saveItemToDatabase() {
+        var item: Item
 
         if (itemId == -1) { // insert new item
             AsyncTask.execute {
@@ -44,7 +56,7 @@ class EditItemActivity : AppCompatActivity() {
 
         } else { // update item
             AsyncTask.execute {
-                item = runBlocking { MainActivity.database.items().findItemById(itemId) }
+                item = MainActivity.database.items().findItemById(itemId)
                 item.name = name.text.toString()
                 item.desc = desc.text.toString()
                 // TODO item.boxId and item.qrCode
