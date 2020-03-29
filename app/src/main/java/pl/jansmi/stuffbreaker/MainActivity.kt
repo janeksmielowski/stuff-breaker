@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -26,12 +27,14 @@ import pl.jansmi.stuffbreaker.database.entity.Box
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity"
+
     val EDIT_ITEM_REQUEST_CODE = 1
     val SCANNER_REQUEST_CODE = 2
     val CAMERA_PERMISSION_REQUEST_CODE = 3
 
     var cameraPermissionGranted: Boolean = false
-    lateinit var currentBox: Box
+    var currentBox: Box? = null
 
     companion object {
         lateinit var database: AppDatabase
@@ -43,20 +46,23 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         database = Room
-            .databaseBuilder(applicationContext, AppDatabase::class.java, "database")
+            .databaseBuilder(applicationContext, AppDatabase::class.java, "database.db")
+            .allowMainThreadQueries()
             .build()
 
-        var initBox: Box = runBlocking { database.boxes().findBoxById(0) }
-        if (initBox == null)
-            currentBox = Box("Localizations", null, null)
-        else
-            currentBox = initBox
+        currentBox = database.boxes().findBoxById(1)
+        if (currentBox == null) {
+            currentBox = Box("Localizations", "", null, null)
+            AsyncTask.execute {
+                database.boxes().insert(currentBox!!)
+            }
+        }
 
         checkPermissions()
 
         add_fab.setOnClickListener {
             val newIntent = Intent(this, EditItemActivity::class.java)
-            newIntent.putExtra("box", currentBox.id)
+            newIntent.putExtra("box", currentBox!!.id)
             startActivityForResult(newIntent, EDIT_ITEM_REQUEST_CODE)
         }
 
@@ -69,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.localization_fragment, LocalizationFragment(currentBox))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!))
             .commit()
 
     }
