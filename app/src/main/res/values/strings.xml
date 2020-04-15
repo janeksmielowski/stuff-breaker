@@ -6,5 +6,6 @@
 
     <string name="title_activity_edit_box">EditBoxActivity</string>
     <string name="title_activity_edit_item">EditItemActivity</string>
+    <string name="action_change">Change</string>
 
 </resources>
