@@ -80,4 +80,32 @@ class EditItemActivity : AppCompatActivity() {
         finish()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                // TODO: store image in temporal variable for further save in database and change button
+            } else {
+                Toast.makeText(applicationContext, "Error while capturing photo", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_item, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_change -> {
+                // TODO: new activity for changing localization/box
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 }

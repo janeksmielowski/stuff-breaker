@@ -3,8 +3,8 @@ package pl.jansmi.stuffbreaker
 import android.app.Activity
 import android.os.AsyncTask
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_edit_item.*
@@ -65,6 +65,21 @@ class EditBoxActivity : AppCompatActivity() {
 
         setResult(Activity.RESULT_OK)
         finish()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_item, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_change -> {
+                // TODO: new activity for changing localization/box
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }
