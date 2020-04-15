@@ -70,4 +70,10 @@ dependencies {
     // ==== QR CODE SCANNER ==== //
     implementation 'me.dm7.barcodescanner:zxing:1.9'
 
+    // ==== PARIS STYLING ==== //
+    implementation 'com.airbnb.android:paris:1.4.0'
+
+    // If you're using Paris annotations.
+    kapt 'com.airbnb.android:paris-processor:1.4.0'
+
 }
