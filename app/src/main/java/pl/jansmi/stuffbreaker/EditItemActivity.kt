@@ -1,20 +1,22 @@
 package pl.jansmi.stuffbreaker
 
 import android.app.Activity
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.set
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
-import kotlinx.coroutines.runBlocking
 import pl.jansmi.stuffbreaker.database.entity.Item
-import java.util.*
 
 class EditItemActivity : AppCompatActivity() {
+
+    val REQUEST_IMAGE_CAPTURE = 1
 
     private var itemId: Int = -1
     private var boxId: Int = -1
@@ -40,8 +42,17 @@ class EditItemActivity : AppCompatActivity() {
             desc.setText(item.desc)
         }
 
+        photo_btn.setOnClickListener { dispatchTakePictureIntent() }
         submit_btn.setOnClickListener { saveItemToDatabase() }
 
+    }
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+            intent.resolveActivity(packageManager)?.also {
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+            }
+        }
     }
 
     private fun saveItemToDatabase() {
