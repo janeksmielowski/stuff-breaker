@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.paris.extensions.style
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
@@ -17,9 +19,11 @@ import pl.jansmi.stuffbreaker.database.entity.Item
 class EditItemActivity : AppCompatActivity() {
 
     val REQUEST_IMAGE_CAPTURE = 1
+    val REQUEST_QR_SCAN = 2
 
     private var itemId: Int = -1
     private var boxId: Int = -1
+    private var qrCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +44,16 @@ class EditItemActivity : AppCompatActivity() {
             titleBox.setText("Edit item")
             name.setText(item.name)
             desc.setText(item.desc)
+
+            // TODO: change image label and btn
+
+            qr_label.text = "QR code attached"
+            qr_btn.text = "Change QR code"
+            qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
         }
 
         photo_btn.setOnClickListener { dispatchTakePictureIntent() }
+        qr_btn.setOnClickListener { dispatchScanQrCodeIntent() }
         submit_btn.setOnClickListener { saveItemToDatabase() }
 
     }
@@ -53,6 +64,14 @@ class EditItemActivity : AppCompatActivity() {
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
             }
         }
+    }
+
+    private fun dispatchScanQrCodeIntent() {
+        // TODO: check if QR code is already scanned
+        //  if not: open activity
+        //  else: open popup with question "Choose action: change QR code [or] delete QR code"
+        val intent = Intent(applicationContext, ScannerActivity::class.java)
+        startActivityForResult(intent, REQUEST_QR_SCAN)
     }
 
     private fun saveItemToDatabase() {
@@ -88,6 +107,16 @@ class EditItemActivity : AppCompatActivity() {
                 // TODO: store image in temporal variable for further save in database and change button
             } else {
                 Toast.makeText(applicationContext, "Error while capturing photo", Toast.LENGTH_SHORT).show()
+            }
+        } else if (requestCode == REQUEST_QR_SCAN) {
+            if (resultCode == Activity.RESULT_OK) {
+                qrCode = data?.getStringExtra("content")
+                // alter layout
+                qr_label.text = "QR code attached"
+                qr_btn.text = "Change QR code"
+                qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+            } else {
+                Toast.makeText(applicationContext, "Error while scanning QR code", Toast.LENGTH_SHORT).show()
             }
         }
 

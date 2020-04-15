@@ -80,6 +80,7 @@
             android:layout_margin="10dp">
 
             <TextView
+                android:id="@+id/photo_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No picture attached"
@@ -101,6 +102,7 @@
             android:layout_margin="10dp">
 
             <TextView
+                android:id="@+id/qr_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No QR code attached"
