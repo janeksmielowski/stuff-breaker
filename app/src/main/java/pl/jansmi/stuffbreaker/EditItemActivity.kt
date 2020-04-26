@@ -39,6 +39,7 @@ class EditItemActivity : AppCompatActivity() {
             return
         }
 
+        // TODO: store item as class variable (easier management)
         if (itemId != -1) {
             val item = MainActivity.database.items().findItemById(itemId)
             titleBox.setText("Edit item")
@@ -46,10 +47,11 @@ class EditItemActivity : AppCompatActivity() {
             desc.setText(item.desc)
 
             // TODO: change image label and btn
-
-            qr_label.text = "QR code attached"
-            qr_btn.text = "Change QR code"
-            qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+            if (!item.qrCode.isNullOrEmpty()) {
+                qr_label.text = "QR code attached"
+                qr_btn.text = "Change QR code"
+                qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+            }
         }
 
         photo_btn.setOnClickListener { dispatchTakePictureIntent() }
@@ -68,8 +70,11 @@ class EditItemActivity : AppCompatActivity() {
 
     private fun dispatchScanQrCodeIntent() {
         // TODO: check if QR code is already scanned
-        //  if not: open activity
-        //  else: open popup with question "Choose action: change QR code [or] delete QR code"
+//        if (qrCode scanned) {
+//            // open new activity for scanning
+//        } else {
+//            // open popup with question "Choose action: change QR code [or] delete QR code"
+//        }
         val intent = Intent(applicationContext, ScannerActivity::class.java)
         startActivityForResult(intent, REQUEST_QR_SCAN)
     }
@@ -89,7 +94,8 @@ class EditItemActivity : AppCompatActivity() {
                 item = MainActivity.database.items().findItemById(itemId)
                 item.name = name.text.toString()
                 item.desc = desc.text.toString()
-                // TODO item.boxId and item.qrCode
+                item.qrCode = qrCode;
+                // TODO item.boxId
                 MainActivity.database.items().update(item)
             }
             Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
@@ -131,6 +137,7 @@ class EditItemActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_change -> {
                 // TODO: new activity for changing localization/box
+                //  and store new localization as boxId variable to further save in db
                 true
             }
             else -> super.onOptionsItemSelected(item)
