@@ -31,6 +31,10 @@ class EditBoxActivity : AppCompatActivity() {
             return
         }
 
+        val parent = MainActivity.database.boxes().findBoxById(parentId)
+        actionBar?.title = parent.name
+        supportActionBar?.title = parent.name
+
         if (boxId != -1) {
             val box = MainActivity.database.boxes().findBoxById(boxId)
             titleBox.setText("Edit box")

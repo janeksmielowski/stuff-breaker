@@ -39,6 +39,10 @@ class EditItemActivity : AppCompatActivity() {
             return
         }
 
+        val box = MainActivity.database.boxes().findBoxById(boxId)
+        actionBar?.title = box.name
+        supportActionBar?.title = box.name
+
         // TODO: store item as class variable (easier management)
         if (itemId != -1) {
             val item = MainActivity.database.items().findItemById(itemId)
