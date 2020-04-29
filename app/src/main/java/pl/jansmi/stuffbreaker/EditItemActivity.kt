@@ -21,7 +21,7 @@ class EditItemActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_QR_SCAN = 2
 
-    private var itemId: Int = -1
+    private var item: Item? = null
     private var boxId: Int = -1
     private var qrCode: String? = null
 
@@ -30,7 +30,7 @@ class EditItemActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_item)
         setSupportActionBar(toolbar)
 
-        itemId = intent.getIntExtra("item", -1)
+        val itemId = intent.getIntExtra("item", -1)
         boxId = intent.getIntExtra("box", -1)
 
         if (boxId == -1) {
@@ -43,15 +43,14 @@ class EditItemActivity : AppCompatActivity() {
         actionBar?.title = box.name
         supportActionBar?.title = box.name
 
-        // TODO: store item as class variable (easier management)
         if (itemId != -1) {
-            val item = MainActivity.database.items().findItemById(itemId)
+            item = MainActivity.database.items().findItemById(itemId)
             titleBox.setText("Edit item")
-            name.setText(item.name)
-            desc.setText(item.desc)
+            name.setText(item!!.name)
+            desc.setText(item!!.desc)
 
             // TODO: change image label and btn
-            if (!item.qrCode.isNullOrEmpty()) {
+            if (!item!!.qrCode.isNullOrEmpty()) {
                 qr_label.text = "QR code attached"
                 qr_btn.text = "Change QR code"
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
@@ -84,23 +83,20 @@ class EditItemActivity : AppCompatActivity() {
     }
 
     private fun saveItemToDatabase() {
-        var item: Item
-
-        if (itemId == -1) { // insert new item
+        if (item == null) { // insert new item
             AsyncTask.execute {
-                item = Item(name.text.toString(), desc.text.toString(), boxId, null)
-                MainActivity.database.items().insert(item)
+                item = Item(name.text.toString(), desc.text.toString(), boxId, qrCode)
+                MainActivity.database.items().insert(item!!)
             }
             Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
 
         } else { // update item
             AsyncTask.execute {
-                item = MainActivity.database.items().findItemById(itemId)
-                item.name = name.text.toString()
-                item.desc = desc.text.toString()
-                item.qrCode = qrCode;
-                // TODO item.boxId
-                MainActivity.database.items().update(item)
+                item!!.name = name.text.toString()
+                item!!.desc = desc.text.toString()
+                item!!.qrCode = qrCode;
+                item!!.boxId = boxId;
+                MainActivity.database.items().update(item!!)
             }
             Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
         }
