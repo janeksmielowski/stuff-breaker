@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
+import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
 
@@ -31,12 +32,13 @@ class EditBoxActivity : AppCompatActivity() {
             return
         }
 
-        val parent = MainActivity.database.boxes().findBoxById(parentId)
+        val database = AppDatabase.getInstance(applicationContext)
+        val parent = database.boxes().findBoxById(parentId)
         actionBar?.title = parent.name
         supportActionBar?.title = parent.name
 
         if (boxId != -1) {
-            val box = MainActivity.database.boxes().findBoxById(boxId)
+            val box = database.boxes().findBoxById(boxId)
             titleBox.setText("Edit box")
             name.setText(box.name)
             desc.setText(box.desc)
@@ -48,21 +50,22 @@ class EditBoxActivity : AppCompatActivity() {
 
     private fun saveBoxToDatabase() {
         var box: Box
+        val database = AppDatabase.getInstance(applicationContext)
 
         if (boxId == -1) { // insert new box
             AsyncTask.execute {
                 box = Box(name.text.toString(), desc.text.toString(), null, parentId)
-                MainActivity.database.boxes().insert(box)
+                database.boxes().insert(box)
             }
             Toast.makeText(this, "Box created successfully!", Toast.LENGTH_SHORT).show()
 
         } else { // update item
             AsyncTask.execute {
-                box = MainActivity.database.boxes().findBoxById(boxId)
+                box = database.boxes().findBoxById(boxId)
                 box.name = name.text.toString()
                 box.desc = desc.text.toString()
                 // TODO box.parent and box.qrCode
-                MainActivity.database.boxes().update(box)
+                database.boxes().update(box)
             }
             Toast.makeText(this, "Box updated successfully!", Toast.LENGTH_SHORT).show()
         }
