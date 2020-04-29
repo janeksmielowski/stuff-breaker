@@ -36,25 +36,19 @@ class MainActivity : AppCompatActivity() {
     var cameraPermissionGranted: Boolean = false
     var currentBox: Box? = null
 
-    companion object {
-        lateinit var database: AppDatabase
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        database = Room
-            .databaseBuilder(applicationContext, AppDatabase::class.java, "database.db")
-            .allowMainThreadQueries()
-            .build()
+        val database = AppDatabase.getInstance(applicationContext)
 
         currentBox = database.boxes().findBoxById(1)
         if (currentBox == null) {
             currentBox = Box("Localizations", "", null, null)
             AsyncTask.execute {
                 database.boxes().insert(currentBox!!)
+                currentBox = database.boxes().findBoxById(1);
             }
         }
 
