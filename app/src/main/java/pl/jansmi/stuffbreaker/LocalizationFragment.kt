@@ -25,7 +25,7 @@ class LocalizationFragment(val box: Box) : Fragment() {
         super.onStart()
 
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ItemsAdapter(box)
+        val viewAdapter = ItemsAdapter(context!!, box)
 
         val recycler = view!!.findViewById<RecyclerView>(R.id.recycler).apply {
             this.setHasFixedSize(true) // necessary?

@@ -1,5 +1,6 @@
 package pl.jansmi.stuffbreaker.adapter
 
+import android.content.Context
 import android.content.Intent
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -12,11 +13,12 @@ import pl.jansmi.stuffbreaker.EditBoxActivity
 import pl.jansmi.stuffbreaker.EditItemActivity
 import pl.jansmi.stuffbreaker.MainActivity
 import pl.jansmi.stuffbreaker.R
+import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
 
 
-class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
+class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
 
     private var boxes: List<Box>
     private var items: List<Item>
@@ -63,8 +65,9 @@ class ItemsAdapter(val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>(
     }
 
     init {
-        boxes = MainActivity.database.boxes().findAllBoxesByParentId(box.id)
-        items = MainActivity.database.items().findAllItemsByBoxId(box.id)
+        val database = AppDatabase.getInstance(context)
+        boxes = database.boxes().findAllBoxesByParentId(box.id)
+        items = database.items().findAllItemsByBoxId(box.id)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
