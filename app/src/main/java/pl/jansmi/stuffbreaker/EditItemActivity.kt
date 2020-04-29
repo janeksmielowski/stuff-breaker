@@ -1,20 +1,30 @@
 package pl.jansmi.stuffbreaker
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.paris.extensions.style
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
+import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Item
+import java.io.*
+import java.lang.Exception
+import java.util.*
 
 class EditItemActivity : AppCompatActivity() {
 
@@ -23,6 +33,8 @@ class EditItemActivity : AppCompatActivity() {
 
     private var item: Item? = null
     private var boxId: Int = -1
+
+    private var imageBitmap: Bitmap? = null
     private var qrCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,21 +51,30 @@ class EditItemActivity : AppCompatActivity() {
             return
         }
 
-        val box = MainActivity.database.boxes().findBoxById(boxId)
+        Log.i("TAG", boxId.toString());
+
+        val database = AppDatabase.getInstance(applicationContext)
+        val box = database.boxes().findBoxById(boxId)
         actionBar?.title = box.name
         supportActionBar?.title = box.name
 
         if (itemId != -1) {
-            item = MainActivity.database.items().findItemById(itemId)
+            item = database.items().findItemById(itemId)
             titleBox.setText("Edit item")
             name.setText(item!!.name)
             desc.setText(item!!.desc)
 
-            // TODO: change image label and btn
             if (!item!!.qrCode.isNullOrEmpty()) {
+                qrCode = item!!.qrCode
                 qr_label.text = "QR code attached"
                 qr_btn.text = "Change QR code"
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+            }
+
+            if (!item!!.imagePath.isNullOrEmpty()) {
+                photo_label.text = "Image attached"
+                photo_btn.text = "Change image"
+                photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
             }
         }
 
@@ -82,21 +103,72 @@ class EditItemActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_QR_SCAN)
     }
 
+    private fun loadImageFromDatabase(path: String?): Bitmap? {
+        if (path == null)
+            return null
+
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
+
+        // TODO: toasts
+        return try {
+            val file = File(directory, path)
+            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+            bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun saveImageToDatabase(image: Bitmap?): String? {
+        if (image == null)
+            return null
+
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
+        val filePath = "${UUID.randomUUID()}.jpg"
+
+        val file = File(directory, filePath)
+        var fos: FileOutputStream?
+
+        // TODO: toasts
+        try {
+            fos = FileOutputStream(file)
+            image.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+
+        return filePath
+    }
+
     private fun saveItemToDatabase() {
+        val database = AppDatabase.getInstance(applicationContext)
+
         if (item == null) { // insert new item
             AsyncTask.execute {
-                item = Item(name.text.toString(), desc.text.toString(), boxId, qrCode)
-                MainActivity.database.items().insert(item!!)
+                val imagePath = saveImageToDatabase(imageBitmap!!)
+                item = Item(name.text.toString(), desc.text.toString(), boxId, qrCode, imagePath)
+                database.items().insert(item!!)
             }
             Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
 
         } else { // update item
             AsyncTask.execute {
+
                 item!!.name = name.text.toString()
                 item!!.desc = desc.text.toString()
                 item!!.qrCode = qrCode;
                 item!!.boxId = boxId;
-                MainActivity.database.items().update(item!!)
+
+                // if image bitmap is updated (else leave unchanged)
+                if (imageBitmap != null)
+                    item!!.imagePath = saveImageToDatabase(imageBitmap)
+
+                database.items().update(item!!)
             }
             Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
         }
@@ -110,17 +182,25 @@ class EditItemActivity : AppCompatActivity() {
 
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
-                // TODO: store image in temporal variable for further save in database and change button
+                imageBitmap = data?.extras?.get("data") as Bitmap
+
+                // alter layout
+                photo_label.text = "Image attached"
+                photo_btn.text = "Change image"
+                photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
+
             } else {
                 Toast.makeText(applicationContext, "Error while capturing photo", Toast.LENGTH_SHORT).show()
             }
         } else if (requestCode == REQUEST_QR_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
                 qrCode = data?.getStringExtra("content")
+
                 // alter layout
                 qr_label.text = "QR code attached"
                 qr_btn.text = "Change QR code"
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+
             } else {
                 Toast.makeText(applicationContext, "Error while scanning QR code", Toast.LENGTH_SHORT).show()
             }
