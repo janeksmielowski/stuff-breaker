@@ -71,12 +71,14 @@ class EditItemActivity : AppCompatActivity(),
 
             if (!item!!.qrCode.isNullOrEmpty()) {
                 qrCode = item!!.qrCode
+                // alter layout
                 qr_label.text = "QR code attached"
                 qr_btn.text = "Change QR code"
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
             }
 
             if (!item!!.imagePath.isNullOrEmpty()) {
+                // alter layout
                 photo_label.text = "Image attached"
                 photo_btn.text = "Change image"
                 photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
@@ -98,7 +100,15 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     override fun onImageDialogDeleteClick(dialog: DialogFragment) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        item!!.imagePath = null
+        imageBitmap = null
+
+        // alter layout
+        photo_label.text = "No picture attached"
+        photo_btn.text = "Attach image"
+        photo_btn.style(R.style.Widget_AppCompat_Button)
+
+        Toast.makeText(applicationContext, "Image removed", Toast.LENGTH_SHORT).show();
     }
 
     private fun dispatchTakePictureIntent() {
@@ -176,7 +186,10 @@ class EditItemActivity : AppCompatActivity(),
 
         if (item == null) { // insert new item
             AsyncTask.execute {
-                val imagePath = saveImageToDatabase(imageBitmap!!)
+                var imagePath: String? = null
+                if (imageBitmap != null)
+                    imagePath = saveImageToDatabase(imageBitmap!!)
+
                 item = Item(name.text.toString(), desc.text.toString(), boxId, qrCode, imagePath)
                 database.items().insert(item!!)
             }
@@ -191,9 +204,10 @@ class EditItemActivity : AppCompatActivity(),
                 item!!.boxId = boxId;
 
                 // if image bitmap is updated (else leave unchanged)
-                if (imageBitmap != null)
+                if (imageBitmap != null) {
                     item!!.imagePath = saveImageToDatabase(imageBitmap)
-
+                    // TODO: remove old image from memory
+                }
                 database.items().update(item!!)
             }
             Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
