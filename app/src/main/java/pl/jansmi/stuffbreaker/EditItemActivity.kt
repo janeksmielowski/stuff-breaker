@@ -111,15 +111,23 @@ class EditItemActivity : AppCompatActivity(),
         photo_btn.text = "Attach image"
         photo_btn.style(R.style.Widget_AppCompat_Button)
 
-        Toast.makeText(applicationContext, "Image removed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(applicationContext, "Image removed", Toast.LENGTH_SHORT).show()
     }
 
     override fun onQRCodeDialogChangeClick(dialog: DialogFragment) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val intent = Intent(applicationContext, ScannerActivity::class.java)
+        startActivityForResult(intent, REQUEST_QR_SCAN)
     }
 
     override fun onQRCodeDialogDeleteClick(dialog: DialogFragment) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        qrCode = null
+
+        // alter layout
+        qr_label.text = "No QR code attached"
+        qr_btn.text = "Attach QR code"
+        qr_btn.style(R.style.Widget_AppCompat_Button)
+
+        Toast.makeText(applicationContext, "QR code removed", Toast.LENGTH_SHORT).show()
     }
 
     private fun dispatchTakePictureIntent() {
