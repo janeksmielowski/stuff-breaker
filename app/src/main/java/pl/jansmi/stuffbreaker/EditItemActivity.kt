@@ -41,6 +41,7 @@ class EditItemActivity : AppCompatActivity(),
     private var item: Item? = null
     private var boxId: Int = -1
 
+    private var shouldRemoveImage: Boolean = false
     private var imageBitmap: Bitmap? = null
     private var qrCode: String? = null
 
@@ -102,8 +103,7 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     override fun onImageDialogDeleteClick(dialog: DialogFragment) {
-        // TODO: mark image to delete (then delete it on submit)
-        // item!!.imagePath = null
+        shouldRemoveImage = true
         imageBitmap = null
 
         // alter layout
@@ -199,6 +199,23 @@ class EditItemActivity : AppCompatActivity(),
         return filePath
     }
 
+    private fun deleteImageFromDatabase(path: String?): Boolean {
+        if (path == null)
+            return false
+
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
+
+        // TODO: toasts
+        return try {
+            val file = File(directory, path)
+            file.delete()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     private fun saveItemToDatabase() {
         val database = AppDatabase.getInstance(applicationContext)
 
@@ -221,11 +238,15 @@ class EditItemActivity : AppCompatActivity(),
                 item!!.qrCode = qrCode;
                 item!!.boxId = boxId;
 
-                // if image bitmap is updated (else leave unchanged)
-                if (imageBitmap != null) {
-                    item!!.imagePath = saveImageToDatabase(imageBitmap)
-                    // TODO: remove old image from memory
+                if (shouldRemoveImage) {
+                    deleteImageFromDatabase(item!!.imagePath)
+                    item!!.imagePath = null
                 }
+
+                // if image bitmap is updated (else leave unchanged)
+                if (imageBitmap != null)
+                    item!!.imagePath = saveImageToDatabase(imageBitmap)
+
                 database.items().update(item!!)
             }
             Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT).show()
@@ -241,6 +262,7 @@ class EditItemActivity : AppCompatActivity(),
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
                 imageBitmap = data?.extras?.get("data") as Bitmap
+                shouldRemoveImage = true
 
                 // alter layout
                 photo_label.text = "Image attached"
