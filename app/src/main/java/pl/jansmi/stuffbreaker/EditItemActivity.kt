@@ -3,6 +3,7 @@ package pl.jansmi.stuffbreaker
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -16,17 +17,21 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import com.airbnb.paris.extensions.style
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Item
+import pl.jansmi.stuffbreaker.dialogs.ImageDialogFragment
 import java.io.*
 import java.lang.Exception
 import java.util.*
 
-class EditItemActivity : AppCompatActivity() {
+class EditItemActivity : AppCompatActivity(),
+    ImageDialogFragment.ImageDialogListener
+{
 
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_QR_SCAN = 2
@@ -84,11 +89,32 @@ class EditItemActivity : AppCompatActivity() {
 
     }
 
-    private fun dispatchTakePictureIntent() {
+    override fun onImageDialogChangeClick(dialog: DialogFragment) {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
             intent.resolveActivity(packageManager)?.also {
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
             }
+        }
+    }
+
+    override fun onImageDialogDeleteClick(dialog: DialogFragment) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun dispatchTakePictureIntent() {
+        if (imageBitmap == null && (item == null || item!!.imagePath.isNullOrEmpty())) {
+            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+                intent.resolveActivity(packageManager)?.also {
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+                }
+            }
+        } else {
+            var image = imageBitmap
+            if (imageBitmap == null && item != null && !item!!.imagePath.isNullOrEmpty())
+                image = loadImageFromDatabase(item!!.imagePath)
+
+            val dialog = ImageDialogFragment(image!!)
+            dialog.show(supportFragmentManager, "ImageDialogFragment")
         }
     }
 
