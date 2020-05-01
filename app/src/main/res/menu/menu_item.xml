@@ -5,7 +5,7 @@
     <item
         android:id="@+id/action_change"
         android:orderInCategory="100"
-        android:title="@string/action_change"
+        android:title="@string/action_change_path"
         app:showAsAction="always"
         />
 

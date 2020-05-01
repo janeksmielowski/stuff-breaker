@@ -2,11 +2,12 @@
     <string name="app_name">Stuffbreaker</string>
     <string name="action_settings">Settings</string>
     <string name="action_new_box">New box</string>
-    <string name="action_change">Change</string>
+    <string name="action_change_path">Change path</string>
     <string name="action_delete">Delete</string>
     <string name="action_edit">Edit</string>
 
     <string name="title_activity_edit_box">EditBoxActivity</string>
     <string name="title_activity_edit_item">EditItemActivity</string>
+    <string name="title_activity_show_item">ShowItemActivity</string>
 
 </resources>

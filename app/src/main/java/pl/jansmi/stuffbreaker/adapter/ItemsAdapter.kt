@@ -12,10 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import pl.jansmi.stuffbreaker.EditBoxActivity
-import pl.jansmi.stuffbreaker.EditItemActivity
-import pl.jansmi.stuffbreaker.MainActivity
-import pl.jansmi.stuffbreaker.R
+import pl.jansmi.stuffbreaker.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
@@ -29,7 +26,6 @@ class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<Ite
     private var boxes: List<Box>
     private var items: List<Item>
 
-    // TODO: image
     class ItemHolder(view: View): RecyclerView.ViewHolder(view) {
         private var title: TextView
         private var desc: TextView
@@ -64,6 +60,7 @@ class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<Ite
             desc.text = box.desc
 
             itemView.setOnClickListener {
+                // TODO: change fragment in MainActivity
                 val intent = Intent(itemView.context, EditBoxActivity::class.java)
                 intent.putExtra("box", box.id)
                 intent.putExtra("parent", box.parentId)
@@ -81,7 +78,7 @@ class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<Ite
                 image.setImageResource(R.drawable.ic_baseline_crop_square_64)
 
             itemView.setOnClickListener {
-                val intent = Intent(itemView.context, EditItemActivity::class.java)
+                val intent = Intent(itemView.context, ShowItemActivity::class.java)
                 intent.putExtra("box", item.boxId)
                 intent.putExtra("item", item.id)
                 itemView.context.startActivity(intent)

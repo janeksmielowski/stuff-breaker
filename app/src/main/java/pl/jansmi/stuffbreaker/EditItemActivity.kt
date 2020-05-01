@@ -59,8 +59,6 @@ class EditItemActivity : AppCompatActivity(),
             return
         }
 
-        Log.i("TAG", boxId.toString());
-
         val database = AppDatabase.getInstance(applicationContext)
         val box = database.boxes().findBoxById(boxId)
         actionBar?.title = box.name
