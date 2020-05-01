@@ -100,7 +100,8 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     override fun onImageDialogDeleteClick(dialog: DialogFragment) {
-        item!!.imagePath = null
+        // TODO: mark image to delete (then delete it on submit)
+        // item!!.imagePath = null
         imageBitmap = null
 
         // alter layout
@@ -166,7 +167,7 @@ class EditItemActivity : AppCompatActivity(),
         val filePath = "${UUID.randomUUID()}.jpg"
 
         val file = File(directory, filePath)
-        var fos: FileOutputStream?
+        val fos: FileOutputStream?
 
         // TODO: toasts
         try {
@@ -230,7 +231,7 @@ class EditItemActivity : AppCompatActivity(),
                 photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
 
             } else {
-                Toast.makeText(applicationContext, "Error while capturing photo", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(applicationContext, "Error while capturing photo", Toast.LENGTH_SHORT).show()
             }
         } else if (requestCode == REQUEST_QR_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
@@ -242,7 +243,7 @@ class EditItemActivity : AppCompatActivity(),
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
 
             } else {
-                Toast.makeText(applicationContext, "Error while scanning QR code", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(applicationContext, "Error while scanning QR code", Toast.LENGTH_SHORT).show()
             }
         }
 
