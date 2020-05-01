@@ -25,12 +25,14 @@ import kotlinx.android.synthetic.main.content_edit_item.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Item
 import pl.jansmi.stuffbreaker.dialogs.ImageDialogFragment
+import pl.jansmi.stuffbreaker.dialogs.QRCodeDialogFragment
 import java.io.*
 import java.lang.Exception
 import java.util.*
 
 class EditItemActivity : AppCompatActivity(),
-    ImageDialogFragment.ImageDialogListener
+    ImageDialogFragment.ImageDialogListener,
+    QRCodeDialogFragment.QRCodeDialogListener
 {
 
     val REQUEST_IMAGE_CAPTURE = 1
@@ -112,6 +114,14 @@ class EditItemActivity : AppCompatActivity(),
         Toast.makeText(applicationContext, "Image removed", Toast.LENGTH_SHORT).show();
     }
 
+    override fun onQRCodeDialogChangeClick(dialog: DialogFragment) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onQRCodeDialogDeleteClick(dialog: DialogFragment) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun dispatchTakePictureIntent() {
         if (imageBitmap == null && (item == null || item!!.imagePath.isNullOrEmpty())) {
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
@@ -130,14 +140,13 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     private fun dispatchScanQrCodeIntent() {
-        // TODO: check if QR code is already scanned
-//        if (qrCode scanned) {
-//            // open new activity for scanning
-//        } else {
-//            // open popup with question "Choose action: change QR code [or] delete QR code"
-//        }
-        val intent = Intent(applicationContext, ScannerActivity::class.java)
-        startActivityForResult(intent, REQUEST_QR_SCAN)
+        if (qrCode == null && (item == null || item!!.qrCode.isNullOrEmpty())) {
+            val intent = Intent(applicationContext, ScannerActivity::class.java)
+            startActivityForResult(intent, REQUEST_QR_SCAN)
+        } else {
+            val dialog = QRCodeDialogFragment()
+            dialog.show(supportFragmentManager, "QRCodeDialogFragment")
+        }
     }
 
     private fun loadImageFromDatabase(path: String?): Bitmap? {
