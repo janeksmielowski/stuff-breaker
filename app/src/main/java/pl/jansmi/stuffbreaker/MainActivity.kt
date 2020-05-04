@@ -94,6 +94,13 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.action_edit -> {
+                val intent = Intent(applicationContext, EditBoxActivity::class.java)
+                intent.putExtra("parent", currentBox!!.parentId)
+                intent.putExtra("box", currentBox!!.id)
+                startActivity(intent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

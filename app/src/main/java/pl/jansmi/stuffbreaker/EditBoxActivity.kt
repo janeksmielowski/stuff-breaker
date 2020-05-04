@@ -26,22 +26,26 @@ class EditBoxActivity : AppCompatActivity() {
         boxId = intent.getIntExtra("box", -1)
         parentId = intent.getIntExtra("parent", -1)
 
-        if (parentId == -1) {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
-            return
-        }
-
         val database = AppDatabase.getInstance(applicationContext)
-        val parent = database.boxes().findBoxById(parentId)
-        actionBar?.title = parent.name
-        supportActionBar?.title = parent.name
+        var box: Box? = null
 
+        // adding new box
         if (boxId != -1) {
-            val box = database.boxes().findBoxById(boxId)
+            box = database.boxes().findBoxById(boxId)
             titleBox.setText("Edit box")
             name.setText(box.name)
             desc.setText(box.desc)
+        }
+
+        // note: we don't expect situation of adding new box not having parent
+        if (parentId == -1) {
+            actionBar?.title = box!!.name
+            supportActionBar?.title = box.name
+
+        } else {
+            val parent = database.boxes().findBoxById(parentId)
+            actionBar?.title = parent.name
+            supportActionBar?.title = parent.name
         }
 
         submit_btn.setOnClickListener { saveBoxToDatabase() }
@@ -76,6 +80,9 @@ class EditBoxActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_item, menu)
+        if (parentId == -1)
+            menu.findItem(R.id.action_change).isEnabled = false
+
         return true
     }
 
