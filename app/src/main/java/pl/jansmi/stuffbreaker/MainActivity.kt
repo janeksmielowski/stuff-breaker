@@ -6,22 +6,15 @@ import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
-import androidx.room.RoomDatabase
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.runBlocking
-import pl.jansmi.stuffbreaker.adapter.ItemsAdapter
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
 
@@ -69,9 +62,23 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent))
             .commit()
 
+        actionBar?.title = currentBox!!.name
+        supportActionBar?.title = currentBox!!.name
+    }
+
+    fun switchContent(box: Box) {
+        currentBox = box;
+        actionBar?.title = box.name
+        supportActionBar?.title = box.name
+
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent))
+            .addToBackStack(currentBox!!.name)
+            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -117,6 +124,16 @@ class MainActivity : AppCompatActivity() {
         } else {
             this.cameraPermissionGranted = true
         }
+    }
+
+    override fun onBackPressed() {
+        if (currentBox!!.parentId != null) {
+            val database = AppDatabase.getInstance(applicationContext)
+            currentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
+            actionBar?.title = currentBox!!.name
+            supportActionBar?.title = currentBox!!.name
+        }
+        super.onBackPressed()
     }
 
 }

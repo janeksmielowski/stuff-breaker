@@ -5,6 +5,7 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -21,12 +22,12 @@ import java.io.FileInputStream
 import java.lang.Exception
 
 
-class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
+class ItemsAdapter(val context: Context, val box: Box, val switchContent: (box: Box) -> Unit): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
 
     private var boxes: List<Box>
     private var items: List<Item>
 
-    class ItemHolder(view: View): RecyclerView.ViewHolder(view) {
+    class ItemHolder(view: View, val switchContent: (box: Box) -> Unit): RecyclerView.ViewHolder(view) {
         private var title: TextView
         private var desc: TextView
         private var image: ImageView
@@ -61,10 +62,12 @@ class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<Ite
 
             itemView.setOnClickListener {
                 // TODO: change fragment in MainActivity
-                val intent = Intent(itemView.context, EditBoxActivity::class.java)
-                intent.putExtra("box", box.id)
-                intent.putExtra("parent", box.parentId)
-                itemView.context.startActivity(intent)
+                switchContent(box)
+                Log.i("TAG", box.name);
+//                val intent = Intent(itemView.context, EditBoxActivity::class.java)
+//                intent.putExtra("box", box.id)
+//                intent.putExtra("parent", box.parentId)
+//                itemView.context.startActivity(intent)
             }
         }
 
@@ -97,7 +100,7 @@ class ItemsAdapter(val context: Context, val box: Box): RecyclerView.Adapter<Ite
         val view = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.listitem, parent, false)
-        return ItemHolder(view)
+        return ItemHolder(view, switchContent)
     }
 
     override fun getItemCount(): Int {

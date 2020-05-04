@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_localization.*
 import pl.jansmi.stuffbreaker.adapter.ItemsAdapter
 import pl.jansmi.stuffbreaker.database.entity.Box
+import kotlin.reflect.KFunction1
 
-class LocalizationFragment(val box: Box) : Fragment() {
+class LocalizationFragment(val box: Box, val switchContent: (box: Box) -> Unit) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +25,7 @@ class LocalizationFragment(val box: Box) : Fragment() {
         super.onStart()
 
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ItemsAdapter(context!!, box)
+        val viewAdapter = ItemsAdapter(context!!, box, switchContent)
 
         val recycler = view!!.findViewById<RecyclerView>(R.id.recycler).apply {
             this.setHasFixedSize(true) // necessary?
