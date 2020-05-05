@@ -17,6 +17,7 @@ class EditBoxActivity : AppCompatActivity() {
 
     private var boxId: Int = -1
     private var parentId: Int = -1
+    private var qrCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +59,7 @@ class EditBoxActivity : AppCompatActivity() {
 
         if (boxId == -1) { // insert new box
             AsyncTask.execute {
-                box = Box(name.text.toString(), desc.text.toString(), null, parentId)
+                box = Box(name.text.toString(), desc.text.toString(), qrCode, parentId)
                 database.boxes().insert(box)
             }
             Toast.makeText(this, "Box created successfully!", Toast.LENGTH_SHORT).show()
@@ -68,7 +69,8 @@ class EditBoxActivity : AppCompatActivity() {
                 box = database.boxes().findBoxById(boxId)
                 box.name = name.text.toString()
                 box.desc = desc.text.toString()
-                // TODO box.parent and box.qrCode
+                box.parentId = parentId
+                box.qrCode = qrCode
                 database.boxes().update(box)
             }
             Toast.makeText(this, "Box updated successfully!", Toast.LENGTH_SHORT).show()

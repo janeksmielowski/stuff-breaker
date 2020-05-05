@@ -23,7 +23,7 @@ class QRCodeDialogFragment: DialogFragment() {
         try {
             listener = context as QRCodeDialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + " must implement ImageDialogListener interface")
+            throw ClassCastException(context.toString() + " must implement QRCodeDialogListener interface")
         }
     }
 

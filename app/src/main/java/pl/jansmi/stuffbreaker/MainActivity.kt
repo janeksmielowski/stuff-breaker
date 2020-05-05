@@ -1,6 +1,7 @@
 package pl.jansmi.stuffbreaker
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
@@ -81,6 +82,21 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    fun deleteBoxAndChildren(box: Box) {
+        val database = AppDatabase.getInstance(applicationContext)
+        database.boxes()
+            .findAllBoxesByParentId(box.id)
+            .forEach {
+                deleteBoxAndChildren(it)
+            }
+        database.items()
+            .findAllItemsByBoxId(box.id)
+            .forEach {
+                database.items().delete(it)
+            }
+        database.boxes().delete(box)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -99,6 +115,31 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("parent", currentBox!!.parentId)
                 intent.putExtra("box", currentBox!!.id)
                 startActivity(intent)
+                true
+            }
+            R.id.action_delete -> {
+                val builder = AlertDialog.Builder(this)
+                builder
+                    .setTitle("Confirm delete")
+                    .setMessage("Are you sure to delete box: ${currentBox!!.name}?")
+                    .setPositiveButton("Yes") { dialog, id ->
+                        // TODO: what if currentBox is Localizations? (parent is null)
+
+                        val database = AppDatabase.getInstance(applicationContext)
+                        val parentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
+
+                        deleteBoxAndChildren(currentBox!!)
+
+                        currentBox = parentBox
+                        actionBar?.title = currentBox!!.name
+                        supportActionBar?.title = currentBox!!.name
+
+                        onBackPressed()
+                    }
+                    .setNegativeButton("No") { dialog, id ->
+                        dialog.cancel()
+                    }
+                builder.create().show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -139,6 +180,7 @@ class MainActivity : AppCompatActivity() {
             currentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
             actionBar?.title = currentBox!!.name
             supportActionBar?.title = currentBox!!.name
+            // TODO: reload fragment content
         }
         super.onBackPressed()
     }
