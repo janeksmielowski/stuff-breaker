@@ -30,10 +30,9 @@ class ScannerActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
     }
 
     override fun handleResult(result: Result?) {
-        Toast.makeText(this, result!!.text, Toast.LENGTH_LONG).show()
-
+        //Toast.makeText(this, result!!.text, Toast.LENGTH_LONG).show()
         val resultIntent = Intent()
-        resultIntent.putExtra("content", result.text)
+        resultIntent.putExtra("content", result!!.text)
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }

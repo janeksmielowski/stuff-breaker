@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         val database = AppDatabase.getInstance(applicationContext)
 
-        currentBox = database.boxes().findBoxById(1)
+        currentBox = database.boxes().findMainBox()
         if (currentBox == null) {
             currentBox = Box("Localizations", "", null, null)
             AsyncTask.execute {
@@ -126,11 +126,15 @@ class MainActivity : AppCompatActivity() {
                         // TODO: what if currentBox is Localizations? (parent is null)
 
                         val database = AppDatabase.getInstance(applicationContext)
-                        val parentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
 
-                        deleteBoxAndChildren(currentBox!!)
+                        if (currentBox!!.parentId != null) {
+                            val parentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
+                            deleteBoxAndChildren(currentBox!!)
+                            currentBox = parentBox
+                        } else {
+                            deleteBoxAndChildren(currentBox!!)
+                        }
 
-                        currentBox = parentBox
                         actionBar?.title = currentBox!!.name
                         supportActionBar?.title = currentBox!!.name
 

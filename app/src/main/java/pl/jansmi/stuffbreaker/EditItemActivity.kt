@@ -289,6 +289,8 @@ class EditItemActivity : AppCompatActivity(),
                     qr_label.text = "QR code attached"
                     qr_btn.text = "Change QR code"
                     qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+                    Toast.makeText(applicationContext, "QR code attached successfully!", Toast.LENGTH_SHORT).show()
+
                 } else {
                     Toast.makeText(applicationContext, "This QR code is already attached to some item or box", Toast.LENGTH_SHORT).show()
                 }

@@ -12,6 +12,9 @@ interface BoxDao {
     @Query("SELECT * FROM Box WHERE qr_code = :qrCode")
     fun findBoxByQrCode(qrCode: String): Box?
 
+    @Query("SELECT * FROM Box WHERE parent IS NULL")
+    fun findMainBox(): Box?
+
     @Query("SELECT * FROM Box WHERE parent = :parentId")
     fun findAllBoxesByParentId(parentId: Int): List<Box>
 
