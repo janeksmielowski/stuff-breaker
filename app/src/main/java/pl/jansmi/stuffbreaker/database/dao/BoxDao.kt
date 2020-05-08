@@ -7,7 +7,10 @@ import pl.jansmi.stuffbreaker.database.entity.Box
 interface BoxDao {
 
     @Query("SELECT * FROM Box WHERE id = :boxId")
-    fun findBoxById(boxId: Int): Box
+    fun findBoxById(boxId: Int): Box?
+
+    @Query("SELECT * FROM Box WHERE qr_code = :qrCode")
+    fun findBoxByQrCode(qrCode: String): Box?
 
     @Query("SELECT * FROM Box WHERE parent = :parentId")
     fun findAllBoxesByParentId(parentId: Int): List<Box>

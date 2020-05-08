@@ -40,7 +40,7 @@ class ShowItemActivity : AppCompatActivity() {
             return
         }
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             val intent = Intent(this, EditItemActivity::class.java)
             intent.putExtra("box", boxId)
             intent.putExtra("item", itemId)
@@ -53,7 +53,7 @@ class ShowItemActivity : AppCompatActivity() {
 
         val database = AppDatabase.getInstance(applicationContext)
         val item = database.items().findItemById(itemId)
-        actionBar?.title = item.name
+        actionBar?.title = item!!.name
         supportActionBar?.title = item.name
 
         if (!item.imagePath.isNullOrEmpty())

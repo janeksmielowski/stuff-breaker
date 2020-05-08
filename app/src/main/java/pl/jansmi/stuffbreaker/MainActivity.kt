@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
                 builder
                     .setTitle("Confirm delete")
                     .setMessage("Are you sure to delete box: ${currentBox!!.name}?")
-                    .setPositiveButton("Yes") { dialog, id ->
+                    .setPositiveButton("Yes") { _, _ ->
                         // TODO: what if currentBox is Localizations? (parent is null)
 
                         val database = AppDatabase.getInstance(applicationContext)
@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
                         onBackPressed()
                     }
-                    .setNegativeButton("No") { dialog, id ->
+                    .setNegativeButton("No") { dialog, _ ->
                         dialog.cancel()
                     }
                 builder.create().show()

@@ -61,7 +61,7 @@ class EditItemActivity : AppCompatActivity(),
 
         val database = AppDatabase.getInstance(applicationContext)
         val box = database.boxes().findBoxById(boxId)
-        actionBar?.title = box.name
+        actionBar?.title = box!!.name
         supportActionBar?.title = box.name
 
         if (itemId != -1) {
@@ -254,6 +254,15 @@ class EditItemActivity : AppCompatActivity(),
         finish()
     }
 
+    private fun qrCodeDuplicate(qr: String): Boolean {
+        val database = AppDatabase.getInstance(this)
+        if (database.items().findItemByQrCode(qr) != null ||
+            database.boxes().findBoxByQrCode(qr) != null) {
+            return true
+        }
+        return false
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -268,19 +277,23 @@ class EditItemActivity : AppCompatActivity(),
                 photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
 
             } else {
-                //Toast.makeText(applicationContext, "Error while capturing photo", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Image capture canceled", Toast.LENGTH_SHORT).show()
             }
         } else if (requestCode == REQUEST_QR_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
-                qrCode = data?.getStringExtra("content")
+                val qr = data?.getStringExtra("content")
+                if (!qrCodeDuplicate(qr!!)) {
+                    qrCode = qr
 
-                // alter layout
-                qr_label.text = "QR code attached"
-                qr_btn.text = "Change QR code"
-                qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
-
+                    // alter layout
+                    qr_label.text = "QR code attached"
+                    qr_btn.text = "Change QR code"
+                    qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
+                } else {
+                    Toast.makeText(applicationContext, "This QR code is already attached to some item or box", Toast.LENGTH_SHORT).show()
+                }
             } else {
-                //Toast.makeText(applicationContext, "Error while scanning QR code", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "QR code scan canceled", Toast.LENGTH_SHORT).show()
             }
         }
 

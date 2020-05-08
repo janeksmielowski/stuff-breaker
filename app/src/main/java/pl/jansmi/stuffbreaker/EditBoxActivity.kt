@@ -34,7 +34,7 @@ class EditBoxActivity : AppCompatActivity() {
         if (boxId != -1) {
             box = database.boxes().findBoxById(boxId)
             titleBox.setText("Edit box")
-            name.setText(box.name)
+            name.setText(box!!.name)
             desc.setText(box.desc)
         }
 
@@ -44,7 +44,7 @@ class EditBoxActivity : AppCompatActivity() {
             supportActionBar?.title = box.name
 
         } else {
-            val parent = database.boxes().findBoxById(parentId)
+            val parent = database.boxes().findBoxById(parentId)!!
             actionBar?.title = parent.name
             supportActionBar?.title = parent.name
         }
@@ -66,7 +66,7 @@ class EditBoxActivity : AppCompatActivity() {
 
         } else { // update item
             AsyncTask.execute {
-                box = database.boxes().findBoxById(boxId)
+                box = database.boxes().findBoxById(boxId)!!
                 box.name = name.text.toString()
                 box.desc = desc.text.toString()
                 box.parentId = parentId
