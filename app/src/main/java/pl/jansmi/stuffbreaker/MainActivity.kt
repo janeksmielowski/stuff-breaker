@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true))
             .commit()
 
         actionBar?.title = currentBox!!.name
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true))
             .addToBackStack(currentBox!!.name)
             .commit()
     }

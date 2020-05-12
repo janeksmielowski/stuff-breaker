@@ -22,10 +22,15 @@ import java.io.FileInputStream
 import java.lang.Exception
 
 
-class ItemsAdapter(val context: Context, val box: Box, val switchContent: (box: Box) -> Unit): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
+class ItemsAdapter(
+    val context: Context,
+    val box: Box,
+    val switchContent: (box: Box) -> Unit,
+    val renderItems: Boolean
+): RecyclerView.Adapter<ItemsAdapter.ItemHolder>() {
 
-    private var boxes: List<Box>
-    private var items: List<Item>
+    private var boxes: List<Box> = ArrayList()
+    private var items: List<Item> = ArrayList()
 
     class ItemHolder(view: View, val switchContent: (box: Box) -> Unit): RecyclerView.ViewHolder(view) {
         private var title: TextView
@@ -61,13 +66,7 @@ class ItemsAdapter(val context: Context, val box: Box, val switchContent: (box: 
             desc.text = box.desc
 
             itemView.setOnClickListener {
-                // TODO: change fragment in MainActivity
                 switchContent(box)
-                Log.i("TAG", box.name);
-//                val intent = Intent(itemView.context, EditBoxActivity::class.java)
-//                intent.putExtra("box", box.id)
-//                intent.putExtra("parent", box.parentId)
-//                itemView.context.startActivity(intent)
             }
         }
 
@@ -93,7 +92,8 @@ class ItemsAdapter(val context: Context, val box: Box, val switchContent: (box: 
     init {
         val database = AppDatabase.getInstance(context)
         boxes = database.boxes().findAllBoxesByParentId(box.id)
-        items = database.items().findAllItemsByBoxId(box.id)
+        if (renderItems)
+            items = database.items().findAllItemsByBoxId(box.id)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {

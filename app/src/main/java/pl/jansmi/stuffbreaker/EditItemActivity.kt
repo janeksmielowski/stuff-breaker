@@ -317,6 +317,7 @@ class EditItemActivity : AppCompatActivity(),
         return when (item.itemId) {
             R.id.action_change -> {
                 val intent = Intent(this, ChangePathActivity::class.java)
+                intent.putExtra("box", boxId)
                 startActivityForResult(intent, REQUEST_CHANGE_PATH)
                 true
             }
