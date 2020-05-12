@@ -1,6 +1,7 @@
 package pl.jansmi.stuffbreaker
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -23,6 +24,7 @@ import java.lang.Exception
 
 class ShowItemActivity : AppCompatActivity() {
 
+    private var item: Item? = null
     private var boxId: Int = -1
     private var itemId: Int = -1
 
@@ -40,11 +42,27 @@ class ShowItemActivity : AppCompatActivity() {
             return
         }
 
-        fab.setOnClickListener {
+        edit_btn.setOnClickListener {
             val intent = Intent(this, EditItemActivity::class.java)
             intent.putExtra("box", boxId)
             intent.putExtra("item", itemId)
             startActivity(intent)
+        }
+
+        delete_btn.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder
+                .setTitle("Confirm delete")
+                .setMessage("Are you sure to delete item: ${item!!.name}?")
+                .setPositiveButton("Yes") { _, _ ->
+                    val database = AppDatabase.getInstance(applicationContext)
+                    database.items().delete(item!!)
+                    finish()
+                }
+                .setNegativeButton("No") { dialog, _ ->
+                    dialog.cancel()
+                }
+            builder.create().show()
         }
     }
 
@@ -52,16 +70,16 @@ class ShowItemActivity : AppCompatActivity() {
         super.onStart()
 
         val database = AppDatabase.getInstance(applicationContext)
-        val item = database.items().findItemById(itemId)
+        item = database.items().findItemById(itemId)
         actionBar?.title = item!!.name
-        supportActionBar?.title = item.name
+        supportActionBar?.title = item!!.name
 
-        if (!item.imagePath.isNullOrEmpty())
-            image.setImageBitmap(loadImageFromDatabase(item.imagePath))
+        if (!item!!.imagePath.isNullOrEmpty())
+            image.setImageBitmap(loadImageFromDatabase(item!!.imagePath))
 
-        description.text = item.desc
+        description.text = item!!.desc
 
-        if (!item.qrCode.isNullOrEmpty()) {
+        if (!item!!.qrCode.isNullOrEmpty()) {
             code.setText("QR code attached")
             code.setTextColor(resources.getColor(R.color.colorPrimary, theme))
         }

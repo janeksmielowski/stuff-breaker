@@ -123,8 +123,6 @@ class MainActivity : AppCompatActivity() {
                     .setTitle("Confirm delete")
                     .setMessage("Are you sure to delete box: ${currentBox!!.name}?")
                     .setPositiveButton("Yes") { _, _ ->
-                        // TODO: what if currentBox is Localizations? (parent is null)
-
                         val database = AppDatabase.getInstance(applicationContext)
 
                         if (currentBox!!.parentId != null) {
