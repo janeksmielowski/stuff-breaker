@@ -1,6 +1,7 @@
 package pl.jansmi.stuffbreaker
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,8 +14,10 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.airbnb.paris.extensions.style
 
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_edit_item.*
 import kotlinx.android.synthetic.main.content_main.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
@@ -151,7 +154,28 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        // TODO: treat scanned code
+        if (requestCode == SCANNER_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val qr = data?.getStringExtra("content")
+                val database = AppDatabase.getInstance(this)
+
+                val box = database.boxes().findBoxByQrCode(qr!!);
+                val item = database.items().findItemByQrCode(qr)
+
+                if (box != null) {
+                    switchContent(box)
+                } else if (item != null) {
+                    val intent = Intent(this, ShowItemActivity::class.java)
+                    intent.putExtra("box", item.boxId)
+                    intent.putExtra("item", item.id)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "No box/item found with this code", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(applicationContext, "QR code scan canceled", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -165,7 +189,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun checkPermissions() {
+    private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
