@@ -17,10 +17,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ChangePathActivity"
+            android:label="@string/title_activity_change_path"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ShowItemActivity"
             android:label="@string/title_activity_show_item"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".ScannerActivity" />
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ScannerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditBoxActivity"
             android:label="@string/title_activity_edit_box"

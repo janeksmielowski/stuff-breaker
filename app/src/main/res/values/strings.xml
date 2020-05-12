@@ -5,9 +5,11 @@
     <string name="action_change_path">Change path</string>
     <string name="action_delete">Delete</string>
     <string name="action_edit">Edit</string>
+    <string name="action_save">Save</string>
 
     <string name="title_activity_edit_box">EditBoxActivity</string>
     <string name="title_activity_edit_item">EditItemActivity</string>
     <string name="title_activity_show_item">ShowItemActivity</string>
+    <string name="title_activity_change_path">ChangePathActivity</string>
 
 </resources>

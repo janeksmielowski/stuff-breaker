@@ -37,6 +37,7 @@ class EditItemActivity : AppCompatActivity(),
 
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_QR_SCAN = 2
+    val REQUEST_CHANGE_PATH = 3
 
     private var item: Item? = null
     private var boxId: Int = -1
@@ -297,6 +298,12 @@ class EditItemActivity : AppCompatActivity(),
             } else {
                 Toast.makeText(applicationContext, "QR code scan canceled", Toast.LENGTH_SHORT).show()
             }
+        } else if (requestCode == REQUEST_CHANGE_PATH) {
+            if (resultCode == Activity.RESULT_OK) {
+                // TODO: intercept new path boxId and store it in global variable
+            } else {
+                // TODO: toast
+            }
         }
 
     }
@@ -309,8 +316,8 @@ class EditItemActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_change -> {
-                // TODO: new activity for changing localization/box
-                //  and store new localization as boxId variable to further save in db
+                val intent = Intent(this, ChangePathActivity::class.java)
+                startActivityForResult(intent, REQUEST_CHANGE_PATH)
                 true
             }
             else -> super.onOptionsItemSelected(item)

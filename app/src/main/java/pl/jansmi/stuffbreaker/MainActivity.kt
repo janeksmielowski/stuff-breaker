@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.title = currentBox!!.name
     }
 
-    fun switchContent(box: Box) {
+    private fun switchContent(box: Box) {
         currentBox = box;
         actionBar?.title = box.name
         supportActionBar?.title = box.name
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    fun deleteBoxAndChildren(box: Box) {
+    private fun deleteBoxAndChildren(box: Box) {
         val database = AppDatabase.getInstance(applicationContext)
         database.boxes()
             .findAllBoxesByParentId(box.id)
