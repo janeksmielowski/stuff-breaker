@@ -7,17 +7,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.airbnb.paris.extensions.style
 
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_edit_item.*
 import kotlinx.android.synthetic.main.content_main.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
@@ -66,6 +63,9 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_from_right, R.anim.slide_out_to_right,
+                R.anim.slide_in_from_right, R.anim.slide_out_to_right)
             .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true))
             .commit()
 
@@ -80,6 +80,9 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_from_right, R.anim.slide_out_to_right,
+                R.anim.slide_in_from_right, R.anim.slide_out_to_right)
             .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true))
             .addToBackStack(currentBox!!.name)
             .commit()

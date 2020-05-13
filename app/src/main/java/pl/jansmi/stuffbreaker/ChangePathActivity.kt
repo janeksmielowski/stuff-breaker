@@ -28,15 +28,33 @@ class ChangePathActivity : AppCompatActivity() {
         }
 
         val database = AppDatabase.getInstance(applicationContext)
-        currentBox = database.boxes().findBoxById(boxId!!)
+        currentBox = database.boxes().findBoxById(boxId)
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.path_fragment, LocalizationFragment(currentBox!!, this::switchContent, false))
-            .commit()
+        val currentPath = getCurrentPath(currentBox!!)
+        currentPath.forEach {
+            supportFragmentManager
+                .beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_from_right, R.anim.slide_out_to_right,
+                    R.anim.slide_in_from_right, R.anim.slide_out_to_right)
+                .add(R.id.path_fragment, LocalizationFragment(it, this::switchContent, false))
+                .addToBackStack(it.name)
+                .commit()
+        }
 
         actionBar?.title = currentBox!!.name
         supportActionBar?.title = currentBox!!.name
+    }
+
+    private fun getCurrentPath(box: Box): ArrayList<Box> {
+        var list = ArrayList<Box>()
+        if (box.parentId != null) {
+            val database = AppDatabase.getInstance(this)
+            val parent = database.boxes().findBoxById(box.parentId!!)
+            list = getCurrentPath(parent!!)
+        }
+        list.add(box)
+        return list
     }
 
     private fun switchContent(box: Box) {
@@ -46,6 +64,9 @@ class ChangePathActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_from_right, R.anim.slide_out_to_right,
+                R.anim.slide_in_from_right, R.anim.slide_out_to_right)
             .add(R.id.path_fragment, LocalizationFragment(currentBox!!, this::switchContent, false))
             .addToBackStack(currentBox!!.name)
             .commit()
@@ -70,7 +91,13 @@ class ChangePathActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (currentBox!!.parentId != null) {
+            val database = AppDatabase.getInstance(applicationContext)
+            currentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
+            actionBar?.title = currentBox!!.name
+            supportActionBar?.title = currentBox!!.name
+            // TODO: reload fragment content
+        }
         super.onBackPressed()
-        // TODO: change fragment appropriately
     }
 }
