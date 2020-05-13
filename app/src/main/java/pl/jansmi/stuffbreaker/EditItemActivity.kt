@@ -300,9 +300,21 @@ class EditItemActivity : AppCompatActivity(),
             }
         } else if (requestCode == REQUEST_CHANGE_PATH) {
             if (resultCode == Activity.RESULT_OK) {
-                // TODO: intercept new path boxId and store it in global variable
+                val tmpBoxId = data?.getIntExtra("box", -1)
+                if (tmpBoxId != -1) {
+                    boxId = tmpBoxId!!;
+
+                    val database = AppDatabase.getInstance(applicationContext)
+                    val box = database.boxes().findBoxById(boxId)
+                    actionBar?.title = box!!.name
+                    supportActionBar?.title = box.name
+
+                    Toast.makeText(applicationContext, "Path changed successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Unexpected error while changing path", Toast.LENGTH_SHORT).show()
+                }
             } else {
-                // TODO: toast
+                Toast.makeText(applicationContext, "Path change canceled", Toast.LENGTH_SHORT).show()
             }
         }
 
