@@ -31,7 +31,7 @@ class ItemsAdapter(
         val view = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.listitem, parent, false)
-        return ItemHolder(view, switchContent)
+        return ItemHolder(view, switchContent, renderItems)
     }
 
     override fun getItemCount(): Int {

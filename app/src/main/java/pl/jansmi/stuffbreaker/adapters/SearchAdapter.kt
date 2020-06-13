@@ -31,7 +31,7 @@ class SearchAdapter(val context: Context): RecyclerView.Adapter<ItemHolder>() {
         val view = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.listitem, parent, false)
-        return ItemHolder(view, null)
+        return ItemHolder(view, null, false)
     }
 
     override fun getItemCount(): Int {

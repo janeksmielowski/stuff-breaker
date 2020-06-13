@@ -1,24 +1,21 @@
 package pl.jansmi.stuffbreaker.adapters
 
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import pl.jansmi.stuffbreaker.MainActivity
-import pl.jansmi.stuffbreaker.R
-import pl.jansmi.stuffbreaker.ShowItemActivity
+import pl.jansmi.stuffbreaker.*
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
-import java.io.File
-import java.io.FileInputStream
-import java.lang.Exception
 
-class ItemHolder(view: View, val switchContent: ((box: Box) -> Unit)?): RecyclerView.ViewHolder(view) {
+class ItemHolder(
+    view: View,
+    val switchContent: ((box: Box) -> Unit)?,
+    val isEditable: Boolean?
+): RecyclerView.ViewHolder(view) {
+
     private var title: TextView
     private var desc: TextView
     private var image: ImageView
@@ -47,6 +44,16 @@ class ItemHolder(view: View, val switchContent: ((box: Box) -> Unit)?): Recycler
                 itemView.context.startActivity(intent)
             }
         }
+
+        if (isEditable != null) {
+            itemView.setOnLongClickListener {
+                val intent = Intent(itemView.context, EditBoxActivity::class.java)
+                intent.putExtra("box", box.id)
+                intent.putExtra("parent", box.parentId)
+                itemView.context.startActivity(intent)
+                return@setOnLongClickListener true
+            }
+        }
     }
 
     fun bindItem(item: Item) {
@@ -63,6 +70,16 @@ class ItemHolder(view: View, val switchContent: ((box: Box) -> Unit)?): Recycler
             intent.putExtra("box", item.boxId)
             intent.putExtra("item", item.id)
             itemView.context.startActivity(intent)
+        }
+
+        if (isEditable != null) {
+            itemView.setOnLongClickListener {
+                val intent = Intent(itemView.context, EditItemActivity::class.java)
+                intent.putExtra("box", item.boxId)
+                intent.putExtra("item", item.id)
+                itemView.context.startActivity(intent)
+                return@setOnLongClickListener true
+            }
         }
     }
 
