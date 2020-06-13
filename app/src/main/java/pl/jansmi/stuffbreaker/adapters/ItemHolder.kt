@@ -51,8 +51,8 @@ class ItemHolder(view: View, val switchContent: ((box: Box) -> Unit)?): Recycler
         title.text = box.name
         desc.text = box.desc
 
-        if (!box.imagePath.isNullOrEmpty())
-            image.setImageBitmap(loadImageFromDatabase(box.imagePath))
+        if (box.image != null)
+            image.setImageBitmap(BitmapFactory.decodeByteArray(box.image, 0, box.image!!.size))
         else
             image.setImageResource(R.drawable.ic_baseline_folder_open_64)
 

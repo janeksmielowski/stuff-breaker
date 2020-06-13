@@ -1,8 +1,6 @@
 package pl.jansmi.stuffbreaker
 
 import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -19,14 +17,9 @@ import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
-import pl.jansmi.stuffbreaker.database.entity.Item
 import pl.jansmi.stuffbreaker.dialogs.ImageDialogFragment
 import pl.jansmi.stuffbreaker.dialogs.QRCodeDialogFragment
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.lang.Exception
-import java.util.*
+import java.io.ByteArrayOutputStream
 
 class EditBoxActivity : AppCompatActivity(),
     ImageDialogFragment.ImageDialogListener,
@@ -40,7 +33,6 @@ class EditBoxActivity : AppCompatActivity(),
     private var box: Box? = null
     private var parentId: Int = -1
 
-    private var shouldRemoveImage: Boolean = false
     private var imageBitmap: Bitmap? = null
     private var qrCode: String? = null
 
@@ -69,7 +61,8 @@ class EditBoxActivity : AppCompatActivity(),
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
             }
 
-            if (!box!!.imagePath.isNullOrEmpty()) {
+            if (box!!.image != null) {
+                imageBitmap = BitmapFactory.decodeByteArray(box!!.image, 0, box!!.image!!.size)
                 // alter layout
                 photo_label.text = "Image attached"
                 photo_btn.text = "Change image"
@@ -104,7 +97,6 @@ class EditBoxActivity : AppCompatActivity(),
     }
 
     override fun onImageDialogDeleteClick(dialog: DialogFragment) {
-        shouldRemoveImage = true
         imageBitmap = null
 
         // alter layout
@@ -132,18 +124,14 @@ class EditBoxActivity : AppCompatActivity(),
     }
 
     private fun dispatchTakePictureIntent() {
-        if (imageBitmap == null && (box == null || box!!.imagePath.isNullOrEmpty())) {
+        if (imageBitmap == null && (box == null || box!!.image == null)) {
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
                 intent.resolveActivity(packageManager)?.also {
                     startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
                 }
             }
         } else {
-            var image = imageBitmap
-            if (imageBitmap == null && box != null && !box!!.imagePath.isNullOrEmpty())
-                image = loadImageFromDatabase(box!!.imagePath)
-
-            val dialog = ImageDialogFragment(image!!)
+            val dialog = ImageDialogFragment(imageBitmap!!)
             dialog.show(supportFragmentManager, "ImageDialogFragment")
         }
     }
@@ -158,75 +146,19 @@ class EditBoxActivity : AppCompatActivity(),
         }
     }
 
-    private fun loadImageFromDatabase(path: String?): Bitmap? {
-        if (path == null)
-            return null
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-
-        // TODO: toasts
-        return try {
-            val file = File(directory, path)
-            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
-            bitmap
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    private fun saveImageToDatabase(image: Bitmap?): String? {
-        if (image == null)
-            return null
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-        val filePath = "${UUID.randomUUID()}.jpg"
-
-        val file = File(directory, filePath)
-        val fos: FileOutputStream?
-
-        // TODO: toasts
-        try {
-            fos = FileOutputStream(file)
-            image.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            fos.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
-
-        return filePath
-    }
-
-    private fun deleteImageFromDatabase(path: String?): Boolean {
-        if (path == null)
-            return false
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-
-        // TODO: toasts
-        return try {
-            val file = File(directory, path)
-            file.delete()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
     private fun saveBoxToDatabase() {
         val database = AppDatabase.getInstance(applicationContext)
 
         if (box == null) { // insert new box
             AsyncTask.execute {
-                var imagePath: String? = null
-                if (imageBitmap != null)
-                    imagePath = saveImageToDatabase(imageBitmap!!)
+                val stream = ByteArrayOutputStream()
+                if (imageBitmap != null) {
+                    imageBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    box = Box(name.text.toString(), desc.text.toString(), qrCode, parentId, stream.toByteArray())
+                } else {
+                    box = Box(name.text.toString(), desc.text.toString(), qrCode, parentId, null)
+                }
 
-                box = Box(name.text.toString(), desc.text.toString(), qrCode, parentId, imagePath)
                 database.boxes().insert(box!!)
             }
             Toast.makeText(this, "Box created successfully!", Toast.LENGTH_SHORT).show()
@@ -238,14 +170,13 @@ class EditBoxActivity : AppCompatActivity(),
                 box!!.parentId = parentId
                 box!!.qrCode = qrCode
 
-                if (shouldRemoveImage) {
-                    deleteImageFromDatabase(box!!.imagePath)
-                    box!!.imagePath = null
+                val stream = ByteArrayOutputStream()
+                if (imageBitmap != null) {
+                    imageBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    box!!.image = stream.toByteArray()
+                } else {
+                    box!!.image = null
                 }
-
-                // if image bitmap is updated (else leave unchanged)
-                if (imageBitmap != null)
-                    box!!.imagePath = saveImageToDatabase(imageBitmap)
 
                 database.boxes().update(box!!)
             }
@@ -271,7 +202,6 @@ class EditBoxActivity : AppCompatActivity(),
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
                 imageBitmap = data?.extras?.get("data") as Bitmap
-                shouldRemoveImage = true
 
                 // alter layout
                 photo_label.text = "Image attached"

@@ -11,7 +11,7 @@ data class Box(
     @ColumnInfo(name = "desc") var desc: String?,
     @ColumnInfo(name = "qr_code") var qrCode: String?,
     @ColumnInfo(name = "parent") var parentId: Int?,
-    @ColumnInfo(name = "image") var imagePath: String?
+    @ColumnInfo(name = "image", typeAffinity = ColumnInfo.BLOB) var image: ByteArray?
 ) {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 }
