@@ -23,6 +23,7 @@ class EditBoxActivity : AppCompatActivity(),
 {
 
     val REQUEST_QR_SCAN = 2
+    val REQUEST_CHANGE_PATH = 3
 
     private var box: Box? = null
     private var parentId: Int = -1
@@ -153,6 +154,24 @@ class EditBoxActivity : AppCompatActivity(),
             } else {
                 Toast.makeText(applicationContext, "QR code scan canceled", Toast.LENGTH_SHORT).show()
             }
+        } else if (requestCode == REQUEST_CHANGE_PATH) {
+            if (resultCode == Activity.RESULT_OK) {
+                val tmpBoxId = data?.getIntExtra("box", -1)
+                if (tmpBoxId != -1) {
+                    parentId = tmpBoxId!!;
+
+                    val database = AppDatabase.getInstance(applicationContext)
+                    val box = database.boxes().findBoxById(parentId)
+                    actionBar?.title = box!!.name
+                    supportActionBar?.title = box.name
+
+                    Toast.makeText(applicationContext, "Path changed successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Unexpected error while changing path", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(applicationContext, "Path change canceled", Toast.LENGTH_SHORT).show()
+            }
         }
 
     }
@@ -168,7 +187,9 @@ class EditBoxActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_change -> {
-                // TODO: new activity for changing localization/box
+                val intent = Intent(this, ChangePathActivity::class.java)
+                intent.putExtra("box", parentId)
+                startActivityForResult(intent, REQUEST_CHANGE_PATH)
                 true
             }
             else -> super.onOptionsItemSelected(item)
