@@ -70,6 +70,8 @@ class EditItemActivity : AppCompatActivity(),
             titleBox.setText("Edit item")
             name.setText(item!!.name)
             desc.setText(item!!.desc)
+            keywords.setText(item!!.keywords)
+            eanUpc.setText(item!!.eanUpc)
 
             if (!item!!.qrCode.isNullOrEmpty()) {
                 qrCode = item!!.qrCode
@@ -224,7 +226,7 @@ class EditItemActivity : AppCompatActivity(),
                 if (imageBitmap != null)
                     imagePath = saveImageToDatabase(imageBitmap!!)
 
-                item = Item(name.text.toString(), desc.text.toString(), null, null, boxId, qrCode, imagePath)
+                item = Item(name.text.toString(), desc.text.toString(), keywords.text.toString(), eanUpc.text.toString(), boxId, qrCode, imagePath)
                 database.items().insert(item!!)
             }
             Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
@@ -233,6 +235,8 @@ class EditItemActivity : AppCompatActivity(),
             AsyncTask.execute {
                 item!!.name = name.text.toString()
                 item!!.desc = desc.text.toString()
+                item!!.keywords = keywords.text.toString()
+                item!!.eanUpc = eanUpc.text.toString()
                 item!!.qrCode = qrCode;
                 item!!.boxId = boxId;
 

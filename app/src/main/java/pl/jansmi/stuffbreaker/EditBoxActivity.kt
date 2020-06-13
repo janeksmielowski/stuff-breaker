@@ -69,6 +69,13 @@ class EditBoxActivity : AppCompatActivity(),
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
             }
 
+            if (!box!!.imagePath.isNullOrEmpty()) {
+                // alter layout
+                photo_label.text = "Image attached"
+                photo_btn.text = "Change image"
+                photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
+            }
+
         }
 
         // note: we don't expect situation of adding new box not having parent
