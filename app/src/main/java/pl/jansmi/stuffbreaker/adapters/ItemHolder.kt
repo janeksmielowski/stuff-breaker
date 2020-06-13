@@ -2,9 +2,12 @@ package pl.jansmi.stuffbreaker.adapters
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import pl.jansmi.stuffbreaker.*
 import pl.jansmi.stuffbreaker.database.entity.Box
@@ -16,17 +19,20 @@ class ItemHolder(
     val isEditable: Boolean?
 ): RecyclerView.ViewHolder(view) {
 
+    private var listItem: RelativeLayout
     private var title: TextView
     private var desc: TextView
     private var image: ImageView
 
     init {
+        listItem = view.findViewById(R.id.list_item)
         title = view.findViewById(R.id.title)
         desc = view.findViewById(R.id.desc)
         image = view.findViewById(R.id.image)
     }
 
     fun bindBox(box: Box) {
+        listItem.setBackgroundColor(Color.parseColor("#f4f4f4"))
         title.text = box.name
         desc.text = box.desc
 

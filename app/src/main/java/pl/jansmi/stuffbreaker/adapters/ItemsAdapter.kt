@@ -22,9 +22,9 @@ class ItemsAdapter(
 
     init {
         val database = AppDatabase.getInstance(context)
-        boxes = database.boxes().findAllBoxesByParentId(box.id)
+        boxes = database.boxes().findAllBoxesByParentId(box.id).sortedBy { box -> box.name }
         if (renderItems)
-            items = database.items().findAllItemsByBoxId(box.id)
+            items = database.items().findAllItemsByBoxId(box.id).sortedBy { item -> item.name }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
