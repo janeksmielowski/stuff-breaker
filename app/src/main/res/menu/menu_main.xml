@@ -18,16 +18,25 @@
         />
 
     <item
+        android:id="@+id/action_search"
+        android:orderInCategory="300"
+        android:title=""
+        android:icon="@drawable/ic_baseline_search_64"
+        android:iconTint="@android:color/white"
+        app:showAsAction="always"
+        />
+
+    <item
         android:id="@+id/action_delete"
-        android:orderInCategory="200"
+        android:orderInCategory="400"
         android:title="@string/action_delete"
         app:showAsAction="never"
         />
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="300"
-        android:title="@string/action_settings"
+        android:id="@+id/action_export"
+        android:orderInCategory="500"
+        android:title="@string/action_export"
         app:showAsAction="never"
         />
 

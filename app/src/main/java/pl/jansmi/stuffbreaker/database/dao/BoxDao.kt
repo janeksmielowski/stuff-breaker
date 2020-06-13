@@ -18,6 +18,12 @@ interface BoxDao {
     @Query("SELECT * FROM Box WHERE parent = :parentId")
     fun findAllBoxesByParentId(parentId: Int): List<Box>
 
+    @Query("SELECT * FROM Box WHERE name LIKE '%' || :query || '%'")
+    fun findAllBoxesMatchingQuery(query: String): List<Box>
+
+    @Query("SELECT * FROM Box")
+    fun findAll(): List<Box>
+
     @Insert
     fun insert(box: Box)
 

@@ -7,9 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import pl.jansmi.stuffbreaker.adapter.ItemsAdapter
+import pl.jansmi.stuffbreaker.adapters.ItemsAdapter
 import pl.jansmi.stuffbreaker.database.entity.Box
-import kotlin.reflect.KFunction1
 
 class LocalizationFragment(
     val box: Box,

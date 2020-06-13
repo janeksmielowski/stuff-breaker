@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Stuffbreaker</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_export">Export</string>
     <string name="action_new_box">New box</string>
     <string name="action_change_path">Change path</string>
     <string name="action_delete">Delete</string>
@@ -11,5 +11,6 @@
     <string name="title_activity_edit_item">EditItemActivity</string>
     <string name="title_activity_show_item">ShowItemActivity</string>
     <string name="title_activity_change_path">ChangePathActivity</string>
+    <string name="title_activity_search">SearchActivity</string>
 
 </resources>

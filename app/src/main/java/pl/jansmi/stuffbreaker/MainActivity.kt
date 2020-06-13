@@ -36,14 +36,20 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val database = AppDatabase.getInstance(applicationContext)
+        val boxId = intent.getIntExtra("box", -1)
 
-        currentBox = database.boxes().findMainBox()
-        if (currentBox == null) {
-            currentBox = Box("Localizations", "", null, null, null)
-            AsyncTask.execute {
-                database.boxes().insert(currentBox!!)
-                currentBox = database.boxes().findBoxById(1);
+        if (boxId == -1) {
+            currentBox = database.boxes().findMainBox()
+            if (currentBox == null) {
+                currentBox = Box("Localizations", "", null, null, null)
+                AsyncTask.execute {
+                    database.boxes().insert(currentBox!!)
+                    currentBox = database.boxes().findBoxById(1);
+                }
             }
+
+        } else {
+            currentBox = database.boxes().findBoxById(boxId)
         }
 
         checkPermissions()
@@ -149,6 +155,14 @@ class MainActivity : AppCompatActivity() {
                         dialog.cancel()
                     }
                 builder.create().show()
+                true
+            }
+            R.id.action_search -> {
+                val intent = Intent(applicationContext, SearchActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_export -> {
                 true
             }
             else -> super.onOptionsItemSelected(item)
