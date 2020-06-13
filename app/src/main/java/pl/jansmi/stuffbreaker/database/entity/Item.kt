@@ -14,7 +14,7 @@ data class Item(
     @ColumnInfo(name = "ean_upc") var eanUpc: String?,
     @ColumnInfo(name = "box_id") var boxId: Int,
     @ColumnInfo(name = "qr_code") var qrCode: String?,
-    @ColumnInfo(name = "image") var imagePath: String?
+    @ColumnInfo(name = "image", typeAffinity = ColumnInfo.BLOB) var image: ByteArray?
 ) {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 }

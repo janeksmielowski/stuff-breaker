@@ -74,8 +74,8 @@ class ShowItemActivity : AppCompatActivity() {
         actionBar?.title = item!!.name
         supportActionBar?.title = item!!.name
 
-        if (!item!!.imagePath.isNullOrEmpty())
-            image.setImageBitmap(loadImageFromDatabase(item!!.imagePath))
+        if (item!!.image != null)
+            image.setImageBitmap(BitmapFactory.decodeByteArray(item!!.image, 0, item!!.image!!.size))
 
         description.text = item!!.desc
 
@@ -85,22 +85,4 @@ class ShowItemActivity : AppCompatActivity() {
         }
     }
 
-    // TODO: unify this loader with other loaders in seperate class
-    private fun loadImageFromDatabase(path: String?): Bitmap? {
-        if (path == null)
-            return null
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-
-        // TODO: toasts
-        return try {
-            val file = File(directory, path)
-            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
-            bitmap
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
 }

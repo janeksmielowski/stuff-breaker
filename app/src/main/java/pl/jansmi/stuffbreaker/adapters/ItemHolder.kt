@@ -29,24 +29,6 @@ class ItemHolder(view: View, val switchContent: ((box: Box) -> Unit)?): Recycler
         image = view.findViewById(R.id.image)
     }
 
-    private fun loadImageFromDatabase(path: String?): Bitmap? {
-        if (path == null)
-            return null
-
-        val contextWrapper = ContextWrapper(itemView.context)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-
-        // TODO: toasts
-        return try {
-            val file = File(directory, path)
-            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
-            bitmap
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     fun bindBox(box: Box) {
         title.text = box.name
         desc.text = box.desc
@@ -71,8 +53,8 @@ class ItemHolder(view: View, val switchContent: ((box: Box) -> Unit)?): Recycler
         title.text = item.name
         desc.text = item.desc
 
-        if (!item.imagePath.isNullOrEmpty())
-            image.setImageBitmap(loadImageFromDatabase(item.imagePath))
+        if (item.image != null)
+            image.setImageBitmap(BitmapFactory.decodeByteArray(item.image, 0, item.image!!.size))
         else
             image.setImageResource(R.drawable.ic_baseline_crop_square_64)
 

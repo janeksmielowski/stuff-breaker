@@ -23,6 +23,7 @@ import com.airbnb.paris.extensions.style
 import kotlinx.android.synthetic.main.activity_edit_item.*
 import kotlinx.android.synthetic.main.content_edit_item.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
+import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
 import pl.jansmi.stuffbreaker.dialogs.ImageDialogFragment
 import pl.jansmi.stuffbreaker.dialogs.QRCodeDialogFragment
@@ -42,7 +43,6 @@ class EditItemActivity : AppCompatActivity(),
     private var item: Item? = null
     private var boxId: Int = -1
 
-    private var shouldRemoveImage: Boolean = false
     private var imageBitmap: Bitmap? = null
     private var qrCode: String? = null
 
@@ -81,7 +81,8 @@ class EditItemActivity : AppCompatActivity(),
                 qr_btn.style(R.style.Widget_AppCompat_Button_Colored)
             }
 
-            if (!item!!.imagePath.isNullOrEmpty()) {
+            if (item!!.image != null) {
+                imageBitmap = BitmapFactory.decodeByteArray(item!!.image, 0, item!!.image!!.size)
                 // alter layout
                 photo_label.text = "Image attached"
                 photo_btn.text = "Change image"
@@ -104,7 +105,6 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     override fun onImageDialogDeleteClick(dialog: DialogFragment) {
-        shouldRemoveImage = true
         imageBitmap = null
 
         // alter layout
@@ -132,18 +132,14 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     private fun dispatchTakePictureIntent() {
-        if (imageBitmap == null && (item == null || item!!.imagePath.isNullOrEmpty())) {
+        if (imageBitmap == null && (item == null || item!!.image == null)) {
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
                 intent.resolveActivity(packageManager)?.also {
                     startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
                 }
             }
         } else {
-            var image = imageBitmap
-            if (imageBitmap == null && item != null && !item!!.imagePath.isNullOrEmpty())
-                image = loadImageFromDatabase(item!!.imagePath)
-
-            val dialog = ImageDialogFragment(image!!)
+            val dialog = ImageDialogFragment(imageBitmap!!)
             dialog.show(supportFragmentManager, "ImageDialogFragment")
         }
     }
@@ -158,75 +154,19 @@ class EditItemActivity : AppCompatActivity(),
         }
     }
 
-    private fun loadImageFromDatabase(path: String?): Bitmap? {
-        if (path == null)
-            return null
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-
-        // TODO: toasts
-        return try {
-            val file = File(directory, path)
-            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
-            bitmap
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    private fun saveImageToDatabase(image: Bitmap?): String? {
-        if (image == null)
-            return null
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-        val filePath = "${UUID.randomUUID()}.jpg"
-
-        val file = File(directory, filePath)
-        val fos: FileOutputStream?
-
-        // TODO: toasts
-        try {
-            fos = FileOutputStream(file)
-            image.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            fos.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
-
-        return filePath
-    }
-
-    private fun deleteImageFromDatabase(path: String?): Boolean {
-        if (path == null)
-            return false
-
-        val contextWrapper = ContextWrapper(applicationContext)
-        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
-
-        // TODO: toasts
-        return try {
-            val file = File(directory, path)
-            file.delete()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
     private fun saveItemToDatabase() {
         val database = AppDatabase.getInstance(applicationContext)
 
         if (item == null) { // insert new item
             AsyncTask.execute {
-                var imagePath: String? = null
-                if (imageBitmap != null)
-                    imagePath = saveImageToDatabase(imageBitmap!!)
+                val stream = ByteArrayOutputStream()
+                if (imageBitmap != null) {
+                    imageBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    item = Item(name.text.toString(), desc.text.toString(), keywords.text.toString(), eanUpc.text.toString(), boxId, qrCode, stream.toByteArray())
+                } else {
+                    item = Item(name.text.toString(), desc.text.toString(), keywords.text.toString(), eanUpc.text.toString(), boxId, qrCode, null)
+                }
 
-                item = Item(name.text.toString(), desc.text.toString(), keywords.text.toString(), eanUpc.text.toString(), boxId, qrCode, imagePath)
                 database.items().insert(item!!)
             }
             Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
@@ -240,14 +180,13 @@ class EditItemActivity : AppCompatActivity(),
                 item!!.qrCode = qrCode;
                 item!!.boxId = boxId;
 
-                if (shouldRemoveImage) {
-                    deleteImageFromDatabase(item!!.imagePath)
-                    item!!.imagePath = null
+                val stream = ByteArrayOutputStream()
+                if (imageBitmap != null) {
+                    imageBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    item!!.image = stream.toByteArray()
+                } else {
+                    item!!.image = null
                 }
-
-                // if image bitmap is updated (else leave unchanged)
-                if (imageBitmap != null)
-                    item!!.imagePath = saveImageToDatabase(imageBitmap)
 
                 database.items().update(item!!)
             }
@@ -273,7 +212,6 @@ class EditItemActivity : AppCompatActivity(),
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
                 imageBitmap = data?.extras?.get("data") as Bitmap
-                shouldRemoveImage = true
 
                 // alter layout
                 photo_label.text = "Image attached"
