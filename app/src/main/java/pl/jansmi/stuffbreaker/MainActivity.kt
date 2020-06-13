@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         currentBox = database.boxes().findMainBox()
         if (currentBox == null) {
-            currentBox = Box("Localizations", "", null, null)
+            currentBox = Box("Localizations", "", null, null, null)
             AsyncTask.execute {
                 database.boxes().insert(currentBox!!)
                 currentBox = database.boxes().findBoxById(1);

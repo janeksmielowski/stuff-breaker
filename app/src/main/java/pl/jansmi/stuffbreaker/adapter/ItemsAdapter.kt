@@ -65,6 +65,11 @@ class ItemsAdapter(
             title.text = box.name
             desc.text = box.desc
 
+            if (!box.imagePath.isNullOrEmpty())
+                image.setImageBitmap(loadImageFromDatabase(box.imagePath))
+            else
+                image.setImageResource(R.drawable.ic_baseline_folder_open_64)
+
             itemView.setOnClickListener {
                 switchContent(box)
             }

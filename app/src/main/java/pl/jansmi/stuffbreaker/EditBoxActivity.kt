@@ -1,10 +1,14 @@
 package pl.jansmi.stuffbreaker
 
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -16,17 +20,28 @@ import kotlinx.android.synthetic.main.content_edit_item.*
 import pl.jansmi.stuffbreaker.database.AppDatabase
 import pl.jansmi.stuffbreaker.database.entity.Box
 import pl.jansmi.stuffbreaker.database.entity.Item
+import pl.jansmi.stuffbreaker.dialogs.ImageDialogFragment
 import pl.jansmi.stuffbreaker.dialogs.QRCodeDialogFragment
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.lang.Exception
+import java.util.*
 
 class EditBoxActivity : AppCompatActivity(),
+    ImageDialogFragment.ImageDialogListener,
     QRCodeDialogFragment.QRCodeDialogListener
 {
 
+    val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_QR_SCAN = 2
     val REQUEST_CHANGE_PATH = 3
 
     private var box: Box? = null
     private var parentId: Int = -1
+
+    private var shouldRemoveImage: Boolean = false
+    private var imageBitmap: Bitmap? = null
     private var qrCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,9 +82,30 @@ class EditBoxActivity : AppCompatActivity(),
             supportActionBar?.title = parent.name
         }
 
+        photo_btn.setOnClickListener { dispatchTakePictureIntent() }
         qr_btn.setOnClickListener { dispatchScanQrCodeIntent() }
         submit_btn.setOnClickListener { saveBoxToDatabase() }
 
+    }
+
+    override fun onImageDialogChangeClick(dialog: DialogFragment) {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+            intent.resolveActivity(packageManager)?.also {
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+            }
+        }
+    }
+
+    override fun onImageDialogDeleteClick(dialog: DialogFragment) {
+        shouldRemoveImage = true
+        imageBitmap = null
+
+        // alter layout
+        photo_label.text = "No picture attached"
+        photo_btn.text = "Attach image"
+        photo_btn.style(R.style.Widget_AppCompat_Button)
+
+        Toast.makeText(applicationContext, "Image removed", Toast.LENGTH_SHORT).show()
     }
 
     override fun onQRCodeDialogChangeClick(dialog: DialogFragment) {
@@ -88,6 +124,23 @@ class EditBoxActivity : AppCompatActivity(),
         Toast.makeText(applicationContext, "QR code removed", Toast.LENGTH_SHORT).show()
     }
 
+    private fun dispatchTakePictureIntent() {
+        if (imageBitmap == null && (box == null || box!!.imagePath.isNullOrEmpty())) {
+            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
+                intent.resolveActivity(packageManager)?.also {
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+                }
+            }
+        } else {
+            var image = imageBitmap
+            if (imageBitmap == null && box != null && !box!!.imagePath.isNullOrEmpty())
+                image = loadImageFromDatabase(box!!.imagePath)
+
+            val dialog = ImageDialogFragment(image!!)
+            dialog.show(supportFragmentManager, "ImageDialogFragment")
+        }
+    }
+
     private fun dispatchScanQrCodeIntent() {
         if (qrCode == null && (box == null || box!!.qrCode.isNullOrEmpty())) {
             val intent = Intent(applicationContext, ScannerActivity::class.java)
@@ -98,12 +151,75 @@ class EditBoxActivity : AppCompatActivity(),
         }
     }
 
+    private fun loadImageFromDatabase(path: String?): Bitmap? {
+        if (path == null)
+            return null
+
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
+
+        // TODO: toasts
+        return try {
+            val file = File(directory, path)
+            val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+            bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun saveImageToDatabase(image: Bitmap?): String? {
+        if (image == null)
+            return null
+
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
+        val filePath = "${UUID.randomUUID()}.jpg"
+
+        val file = File(directory, filePath)
+        val fos: FileOutputStream?
+
+        // TODO: toasts
+        try {
+            fos = FileOutputStream(file)
+            image.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+
+        return filePath
+    }
+
+    private fun deleteImageFromDatabase(path: String?): Boolean {
+        if (path == null)
+            return false
+
+        val contextWrapper = ContextWrapper(applicationContext)
+        val directory = contextWrapper.getDir("images", Context.MODE_PRIVATE)
+
+        // TODO: toasts
+        return try {
+            val file = File(directory, path)
+            file.delete()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     private fun saveBoxToDatabase() {
         val database = AppDatabase.getInstance(applicationContext)
 
         if (box == null) { // insert new box
             AsyncTask.execute {
-                box = Box(name.text.toString(), desc.text.toString(), qrCode, parentId)
+                var imagePath: String? = null
+                if (imageBitmap != null)
+                    imagePath = saveImageToDatabase(imageBitmap!!)
+
+                box = Box(name.text.toString(), desc.text.toString(), qrCode, parentId, imagePath)
                 database.boxes().insert(box!!)
             }
             Toast.makeText(this, "Box created successfully!", Toast.LENGTH_SHORT).show()
@@ -114,6 +230,15 @@ class EditBoxActivity : AppCompatActivity(),
                 box!!.desc = desc.text.toString()
                 box!!.parentId = parentId
                 box!!.qrCode = qrCode
+
+                if (shouldRemoveImage) {
+                    deleteImageFromDatabase(box!!.imagePath)
+                    box!!.imagePath = null
+                }
+
+                // if image bitmap is updated (else leave unchanged)
+                if (imageBitmap != null)
+                    box!!.imagePath = saveImageToDatabase(imageBitmap)
 
                 database.boxes().update(box!!)
             }
@@ -136,7 +261,20 @@ class EditBoxActivity : AppCompatActivity(),
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_QR_SCAN) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                imageBitmap = data?.extras?.get("data") as Bitmap
+                shouldRemoveImage = true
+
+                // alter layout
+                photo_label.text = "Image attached"
+                photo_btn.text = "Change image"
+                photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
+                Toast.makeText(applicationContext, "Image attached successfully!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(applicationContext, "Image capture canceled", Toast.LENGTH_SHORT).show()
+            }
+        } else if (requestCode == REQUEST_QR_SCAN) {
             if (resultCode == Activity.RESULT_OK) {
                 val qr = data?.getStringExtra("content")
                 if (!qrCodeDuplicate(qr!!)) {

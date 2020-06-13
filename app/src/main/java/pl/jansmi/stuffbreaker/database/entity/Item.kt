@@ -10,6 +10,8 @@ import androidx.room.PrimaryKey
 data class Item(
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "desc") var desc: String?,
+    @ColumnInfo(name = "keywords") var keywords: String?,
+    @ColumnInfo(name = "ean_upc") var eanUpc: String?,
     @ColumnInfo(name = "box_id") var boxId: Int,
     @ColumnInfo(name = "qr_code") var qrCode: String?,
     @ColumnInfo(name = "image") var imagePath: String?

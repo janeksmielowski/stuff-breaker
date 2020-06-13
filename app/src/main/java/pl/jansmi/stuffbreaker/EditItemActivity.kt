@@ -224,14 +224,13 @@ class EditItemActivity : AppCompatActivity(),
                 if (imageBitmap != null)
                     imagePath = saveImageToDatabase(imageBitmap!!)
 
-                item = Item(name.text.toString(), desc.text.toString(), boxId, qrCode, imagePath)
+                item = Item(name.text.toString(), desc.text.toString(), null, null, boxId, qrCode, imagePath)
                 database.items().insert(item!!)
             }
             Toast.makeText(this, "Item created successfully!", Toast.LENGTH_SHORT).show()
 
         } else { // update item
             AsyncTask.execute {
-
                 item!!.name = name.text.toString()
                 item!!.desc = desc.text.toString()
                 item!!.qrCode = qrCode;
@@ -276,7 +275,7 @@ class EditItemActivity : AppCompatActivity(),
                 photo_label.text = "Image attached"
                 photo_btn.text = "Change image"
                 photo_btn.style(R.style.Widget_AppCompat_Button_Colored)
-
+                Toast.makeText(applicationContext, "Image attached successfully!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(applicationContext, "Image capture canceled", Toast.LENGTH_SHORT).show()
             }
