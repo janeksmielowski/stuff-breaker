@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         scan_fab.setOnClickListener {
             if (this.cameraPermissionGranted) {
                 val newIntent = Intent(this, ScannerActivity::class.java)
+                newIntent.putExtra("shouldValidate", true)
                 startActivityForResult(newIntent, SCANNER_REQUEST_CODE)
             }
         }
