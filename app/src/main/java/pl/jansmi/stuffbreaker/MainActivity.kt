@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -25,9 +26,12 @@ class MainActivity : AppCompatActivity() {
 
     val EDIT_ITEM_REQUEST_CODE = 1
     val SCANNER_REQUEST_CODE = 2
-    val CAMERA_PERMISSION_REQUEST_CODE = 3
+    val PERMISSION_REQUEST_CODE = 3
 
     var cameraPermissionGranted: Boolean = false
+    var readPermissionGranted: Boolean = false
+    var writePermissionGranted: Boolean = false
+
     var currentBox: Box? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -162,7 +166,11 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.action_import -> {
+                true
+            }
             R.id.action_export -> {
+                AppDatabase.exportDatabase(this)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -199,23 +207,46 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && permissions[0].equals(Manifest.permission.CAMERA)) {
+        if (requestCode == PERMISSION_REQUEST_CODE && grantResults.isNotEmpty()) {
             if (grantResults[0].equals(PackageManager.PERMISSION_GRANTED))
                 this.cameraPermissionGranted = true
             else
                 Toast.makeText(this, "You will not be able to scan QR codes, until you grant camera permission.", Toast.LENGTH_SHORT).show()
+
+            if (grantResults[1].equals(PackageManager.PERMISSION_GRANTED))
+                this.readPermissionGranted = true
+            else
+                Toast.makeText(this, "You will not be able to import database, until you grant storage read permission.", Toast.LENGTH_LONG).show()
+
+            if (grantResults[2].equals(PackageManager.PERMISSION_GRANTED))
+                this.writePermissionGranted = true
+            else
+                Toast.makeText(this, "You will not be able to export database, until you grant storage write permission.", Toast.LENGTH_LONG).show()
         }
+
     }
 
     private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.CAMERA),
-                CAMERA_PERMISSION_REQUEST_CODE)
+        Log.i(TAG, ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),
+                PERMISSION_REQUEST_CODE
+            )
         } else {
             this.cameraPermissionGranted = true
+            this.readPermissionGranted = true
+            this.writePermissionGranted = true
         }
+
     }
 
     override fun onBackPressed() {
