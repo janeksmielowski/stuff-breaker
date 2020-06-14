@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             .setCustomAnimations(
                 R.anim.slide_in_from_right, R.anim.slide_out_to_right,
                 R.anim.slide_in_from_right, R.anim.slide_out_to_right)
-            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true, null))
             .commit()
 
         actionBar?.title = currentBox!!.name
@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
             .setCustomAnimations(
                 R.anim.slide_in_from_right, R.anim.slide_out_to_right,
                 R.anim.slide_in_from_right, R.anim.slide_out_to_right)
-            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true))
+            .add(R.id.localization_fragment, LocalizationFragment(currentBox!!, this::switchContent, true, null))
             .addToBackStack(currentBox!!.name)
             .commit()
     }

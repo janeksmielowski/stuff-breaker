@@ -13,7 +13,8 @@ import pl.jansmi.stuffbreaker.database.entity.Box
 class LocalizationFragment(
     val box: Box,
     val switchContent: (box: Box) -> Unit,
-    val renderItems: Boolean
+    val renderItems: Boolean,
+    val excludeBoxId: Int?
 ) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +29,7 @@ class LocalizationFragment(
         super.onStart()
 
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ItemsAdapter(context!!, box, switchContent, renderItems)
+        val viewAdapter = ItemsAdapter(context!!, box, switchContent, renderItems, excludeBoxId)
 
         val recycler = view!!.findViewById<RecyclerView>(R.id.recycler).apply {
             this.setHasFixedSize(true) // necessary?

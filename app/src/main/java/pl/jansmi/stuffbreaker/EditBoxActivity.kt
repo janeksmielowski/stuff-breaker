@@ -264,6 +264,7 @@ class EditBoxActivity : AppCompatActivity(),
             R.id.action_change -> {
                 val intent = Intent(this, ChangePathActivity::class.java)
                 intent.putExtra("box", parentId)
+                intent.putExtra("exclude", box!!.id)
                 startActivityForResult(intent, REQUEST_CHANGE_PATH)
                 true
             }
