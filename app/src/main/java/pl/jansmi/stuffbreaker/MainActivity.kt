@@ -167,10 +167,13 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_import -> {
+                if (this.readPermissionGranted)
+                    AppDatabase.importDatabase(this)
                 true
             }
             R.id.action_export -> {
-                AppDatabase.exportDatabase(this)
+                if (this.writePermissionGranted)
+                    AppDatabase.exportDatabase(this)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -227,7 +230,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        Log.i(TAG, ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED

@@ -48,23 +48,25 @@ abstract class AppDatabase: RoomDatabase() {
 
         fun importDatabase(context: Context) {
             try {
-                copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME", context.getDatabasePath("$DB_NAME").path)
-                copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-shm", context.getDatabasePath("$DB_NAME-shm").path)
-                copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-wal", context.getDatabasePath("$DB_NAME-wal").path)
+                copy(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/$DB_NAME", context.getDatabasePath("$DB_NAME").path)
+                copy(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/$DB_NAME-shm", context.getDatabasePath("$DB_NAME-shm").path)
+                copy(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/$DB_NAME-wal", context.getDatabasePath("$DB_NAME-wal").path)
+                Toast.makeText(context, "Database import success! Please restart the app to update records.", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(context, "Database import failed. Please check if you have properly named files in the selected directory.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Database import failed. Please check if you have put all the necessary files under /Documents path.", Toast.LENGTH_LONG).show()
             }
         }
 
         fun exportDatabase(context: Context) {
             try {
-                copy(context.getDatabasePath("$DB_NAME").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME")
-                copy(context.getDatabasePath("$DB_NAME-shm").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-shm")
-                copy(context.getDatabasePath("$DB_NAME-wal").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-wal")
+                copy(context.getDatabasePath("$DB_NAME").path, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/$DB_NAME")
+                copy(context.getDatabasePath("$DB_NAME-shm").path, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/$DB_NAME-shm")
+                copy(context.getDatabasePath("$DB_NAME-wal").path, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/$DB_NAME-wal")
+                Toast.makeText(context, "Database export success! You will find necessary files under /Documents directory.", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(context, "Database export failed. Please check if the selected directory is valid.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Database export failed. Please check if you have /Documents directory in you home path.", Toast.LENGTH_LONG).show()
             }
         }
     }
