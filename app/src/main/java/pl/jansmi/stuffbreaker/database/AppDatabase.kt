@@ -20,7 +20,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun items(): ItemDao
 
     companion object {
-        private val DB_NAME = "database";
+        private val DB_NAME = "database.db";
         private var db: AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase {
@@ -31,7 +31,7 @@ abstract class AppDatabase: RoomDatabase() {
 
         private fun buildDatabaseInstance(context: Context): AppDatabase {
             return Room
-                .databaseBuilder(context, AppDatabase::class.java, "$DB_NAME.db")
+                .databaseBuilder(context, AppDatabase::class.java, "$DB_NAME")
                 .allowMainThreadQueries()
                 .build()
         }
@@ -48,7 +48,7 @@ abstract class AppDatabase: RoomDatabase() {
 
         fun importDatabase(context: Context) {
             try {
-                copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME.db", context.getDatabasePath("$DB_NAME.db").path)
+                copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME", context.getDatabasePath("$DB_NAME").path)
                 copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-shm", context.getDatabasePath("$DB_NAME-shm").path)
                 copy(Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-wal", context.getDatabasePath("$DB_NAME-wal").path)
             } catch (e: Exception) {
@@ -59,7 +59,7 @@ abstract class AppDatabase: RoomDatabase() {
 
         fun exportDatabase(context: Context) {
             try {
-                copy(context.getDatabasePath("$DB_NAME.db").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME.db")
+                copy(context.getDatabasePath("$DB_NAME").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME")
                 copy(context.getDatabasePath("$DB_NAME-shm").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-shm")
                 copy(context.getDatabasePath("$DB_NAME-wal").path, Environment.getExternalStorageDirectory().path + "/Download/$DB_NAME-wal")
             } catch (e: Exception) {
