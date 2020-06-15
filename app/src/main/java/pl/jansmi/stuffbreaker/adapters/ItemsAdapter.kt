@@ -14,7 +14,8 @@ class ItemsAdapter(
     val context: Context,
     val box: Box,
     val switchContent: (box: Box) -> Unit,
-    val renderItems: Boolean
+    val renderItems: Boolean,
+    val excludeBoxId: Int?
 ): RecyclerView.Adapter<ItemHolder>() {
 
     private var boxes: List<Box> = ArrayList()
@@ -23,6 +24,8 @@ class ItemsAdapter(
     init {
         val database = AppDatabase.getInstance(context)
         boxes = database.boxes().findAllBoxesByParentId(box.id).sortedBy { box -> box.name }
+        if (excludeBoxId != null && excludeBoxId != -1)
+            boxes = boxes.filter { box -> box.id != excludeBoxId }
         if (renderItems)
             items = database.items().findAllItemsByBoxId(box.id).sortedBy { item -> item.name }
     }

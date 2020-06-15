@@ -12,6 +12,7 @@ import pl.jansmi.stuffbreaker.database.entity.Box
 
 class ChangePathActivity : AppCompatActivity() {
 
+    var excludeBoxId: Int? = null
     var currentBox: Box? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,6 +21,7 @@ class ChangePathActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val boxId = intent.getIntExtra("box", -1)
+        val excludeBoxId = intent.getIntExtra("exclude", -1)
 
         if (boxId == -1) {
             setResult(Activity.RESULT_CANCELED)
@@ -37,7 +39,7 @@ class ChangePathActivity : AppCompatActivity() {
                 .setCustomAnimations(
                     R.anim.slide_in_from_right, R.anim.slide_out_to_right,
                     R.anim.slide_in_from_right, R.anim.slide_out_to_right)
-                .add(R.id.path_fragment, LocalizationFragment(it, this::switchContent, false))
+                .add(R.id.path_fragment, LocalizationFragment(it, this::switchContent, false, excludeBoxId))
                 .addToBackStack(it.name)
                 .commit()
         }
@@ -67,7 +69,7 @@ class ChangePathActivity : AppCompatActivity() {
             .setCustomAnimations(
                 R.anim.slide_in_from_right, R.anim.slide_out_to_right,
                 R.anim.slide_in_from_right, R.anim.slide_out_to_right)
-            .add(R.id.path_fragment, LocalizationFragment(currentBox!!, this::switchContent, false))
+            .add(R.id.path_fragment, LocalizationFragment(currentBox!!, this::switchContent, false, excludeBoxId))
             .addToBackStack(currentBox!!.name)
             .commit()
     }
