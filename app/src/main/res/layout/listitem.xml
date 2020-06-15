@@ -9,7 +9,7 @@
         android:layout_width="65sp"
         android:layout_height="65sp"
         android:layout_margin="15dp"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:src="@drawable/ic_baseline_folder_open_64"
         />
 
