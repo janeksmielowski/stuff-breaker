@@ -45,12 +45,17 @@ class MainActivity : AppCompatActivity() {
 
         if (boxId == -1) {
             currentBox = database.boxes().findMainBox()
+
             if (currentBox == null) {
                 currentBox = Box("Localizations", "", null, null, null)
-                AsyncTask.execute {
-                    database.boxes().insert(currentBox!!)
-                    currentBox = database.boxes().findBoxById(1);
-                }
+                database.boxes().insert(currentBox!!)
+                currentBox = database.boxes().findMainBox()
+
+                // Sample locations
+                database.boxes().insert(Box("Attic", "", null, currentBox!!.id, null))
+                database.boxes().insert(Box("Basement", "", null, currentBox!!.id, null))
+                database.boxes().insert(Box("Garage", "", null, currentBox!!.id, null))
+                database.boxes().insert(Box("Other", "", null, currentBox!!.id, null))
             }
 
         } else {
