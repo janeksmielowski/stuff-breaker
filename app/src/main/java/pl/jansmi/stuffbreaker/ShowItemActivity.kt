@@ -78,6 +78,12 @@ class ShowItemActivity : AppCompatActivity() {
             image.setImageBitmap(BitmapFactory.decodeByteArray(item!!.image, 0, item!!.image!!.size))
 
         description.text = item!!.desc
+        if (item!!.eanUpc.isNullOrEmpty())
+            ean.text = ""
+        else
+            ean.text = "EAN/UPC: " + item!!.eanUpc
+
+        kwds.text = item!!.keywords
 
         if (!item!!.qrCode.isNullOrEmpty()) {
             code.setText("QR code attached")
