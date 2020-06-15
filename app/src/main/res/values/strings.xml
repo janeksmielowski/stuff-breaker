@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Stuffbreaker</string>
+    <string name="action_import">Import</string>
     <string name="action_export">Export</string>
     <string name="action_new_box">New box</string>
     <string name="action_change_path">Change path</string>
@@ -7,11 +8,10 @@
     <string name="action_edit">Edit</string>
     <string name="action_save">Save</string>
 
-    <string name="title_activity_edit_box">EditBoxActivity</string>
-    <string name="title_activity_edit_item">EditItemActivity</string>
-    <string name="title_activity_show_item">ShowItemActivity</string>
-    <string name="title_activity_change_path">ChangePathActivity</string>
-    <string name="title_activity_search">SearchActivity</string>
-    <string name="action_import">Import</string>
+    <string name="title_activity_edit_box">Edit Box</string>
+    <string name="title_activity_edit_item">Edit Item</string>
+    <string name="title_activity_show_item">Item</string>
+    <string name="title_activity_change_path">Change Path</string>
+    <string name="title_activity_search">Search</string>
 
 </resources>
