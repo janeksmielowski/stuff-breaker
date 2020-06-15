@@ -98,7 +98,6 @@ class ChangePathActivity : AppCompatActivity() {
             currentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
             actionBar?.title = currentBox!!.name
             supportActionBar?.title = currentBox!!.name
-            // TODO: reload fragment content
         }
         super.onBackPressed()
     }

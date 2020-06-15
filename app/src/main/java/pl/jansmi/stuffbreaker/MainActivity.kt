@@ -24,9 +24,10 @@ class MainActivity : AppCompatActivity() {
 
     private val TAG = "MainActivity"
 
-    val EDIT_ITEM_REQUEST_CODE = 1
-    val SCANNER_REQUEST_CODE = 2
-    val PERMISSION_REQUEST_CODE = 3
+    val EDIT_BOX_REQUEST_CODE = 1
+    val EDIT_ITEM_REQUEST_CODE = 2
+    val SCANNER_REQUEST_CODE = 3
+    val PERMISSION_REQUEST_CODE = 4
 
     var cameraPermissionGranted: Boolean = false
     var readPermissionGranted: Boolean = false
@@ -126,14 +127,14 @@ class MainActivity : AppCompatActivity() {
             R.id.action_new_box -> {
                 val intent = Intent(applicationContext, EditBoxActivity::class.java)
                 intent.putExtra("parent", currentBox!!.id)
-                startActivity(intent)
+                startActivityForResult(intent, EDIT_BOX_REQUEST_CODE)
                 true
             }
             R.id.action_edit -> {
                 val intent = Intent(applicationContext, EditBoxActivity::class.java)
                 intent.putExtra("parent", currentBox!!.parentId)
                 intent.putExtra("box", currentBox!!.id)
-                startActivity(intent)
+                startActivityForResult(intent, EDIT_BOX_REQUEST_CODE)
                 true
             }
             R.id.action_delete -> {
@@ -211,6 +212,11 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        // reload fragment on activities result
+        if (requestCode == EDIT_BOX_REQUEST_CODE || requestCode == EDIT_ITEM_REQUEST_CODE) {
+            reloadFragment(currentBox!!.name)
+        }
+
         if (requestCode == SCANNER_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 val qr = data?.getStringExtra("content")
@@ -279,13 +285,24 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun reloadFragment(name: String) {
+        val fragment = supportFragmentManager.findFragmentByTag(name)
+        if (fragment != null) {
+            supportFragmentManager
+                .beginTransaction()
+                .detach(fragment)
+                .attach(fragment)
+                .commit()
+        }
+    }
+
     override fun onBackPressed() {
         if (currentBox != null && currentBox!!.parentId != null) {
             val database = AppDatabase.getInstance(applicationContext)
             currentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
             actionBar?.title = currentBox!!.name
             supportActionBar?.title = currentBox!!.name
-            // TODO: reload fragment content
+            reloadFragment(currentBox!!.name)
         }
         super.onBackPressed()
     }
