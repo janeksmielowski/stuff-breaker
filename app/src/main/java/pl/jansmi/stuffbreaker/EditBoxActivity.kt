@@ -124,7 +124,7 @@ class EditBoxActivity : AppCompatActivity(),
     }
 
     private fun dispatchTakePictureIntent() {
-        if (imageBitmap == null && (box == null || box!!.image == null)) {
+        if (imageBitmap == null) {
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
                 intent.resolveActivity(packageManager)?.also {
                     startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
@@ -137,7 +137,7 @@ class EditBoxActivity : AppCompatActivity(),
     }
 
     private fun dispatchScanQrCodeIntent() {
-        if (qrCode == null && (box == null || box!!.qrCode.isNullOrEmpty())) {
+        if (qrCode == null) {
             val intent = Intent(applicationContext, ScannerActivity::class.java)
             startActivityForResult(intent, REQUEST_QR_SCAN)
         } else {

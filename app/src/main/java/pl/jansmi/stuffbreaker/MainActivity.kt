@@ -69,6 +69,8 @@ class MainActivity : AppCompatActivity() {
                 val newIntent = Intent(this, ScannerActivity::class.java)
                 newIntent.putExtra("shouldValidate", true)
                 startActivityForResult(newIntent, SCANNER_REQUEST_CODE)
+            } else {
+                checkPermissions()
             }
         }
 
@@ -167,13 +169,39 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_import -> {
-                if (this.readPermissionGranted)
-                    AppDatabase.importDatabase(this)
+                if (this.readPermissionGranted) {
+                    val builder = AlertDialog.Builder(this)
+                    builder
+                        .setTitle("Import database")
+                        .setMessage("Are you sure to import database from /Documents?")
+                        .setPositiveButton("Yes") { _, _ ->
+                            AppDatabase.importDatabase(this)
+                        }
+                        .setNegativeButton("No") { dialog, _ ->
+                            dialog.cancel()
+                        }
+                    builder.create().show()
+                } else {
+                    checkPermissions()
+                }
                 true
             }
             R.id.action_export -> {
-                if (this.writePermissionGranted)
-                    AppDatabase.exportDatabase(this)
+                if (this.writePermissionGranted) {
+                    val builder = AlertDialog.Builder(this)
+                    builder
+                        .setTitle("Export database")
+                        .setMessage("Are you sure to export database to /Documents?")
+                        .setPositiveButton("Yes") { _, _ ->
+                            AppDatabase.exportDatabase(this)
+                        }
+                        .setNegativeButton("No") { dialog, _ ->
+                            dialog.cancel()
+                        }
+                    builder.create().show()
+                } else {
+                    checkPermissions()
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -252,7 +280,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (currentBox!!.parentId != null) {
+        if (currentBox != null && currentBox!!.parentId != null) {
             val database = AppDatabase.getInstance(applicationContext)
             currentBox = database.boxes().findBoxById(currentBox!!.parentId!!)
             actionBar?.title = currentBox!!.name

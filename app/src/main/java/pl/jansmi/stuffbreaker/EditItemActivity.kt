@@ -132,7 +132,7 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     private fun dispatchTakePictureIntent() {
-        if (imageBitmap == null && (item == null || item!!.image == null)) {
+        if (imageBitmap == null) {
             Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
                 intent.resolveActivity(packageManager)?.also {
                     startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
@@ -145,7 +145,7 @@ class EditItemActivity : AppCompatActivity(),
     }
 
     private fun dispatchScanQrCodeIntent() {
-        if (qrCode == null && (item == null || item!!.qrCode.isNullOrEmpty())) {
+        if (qrCode == null) {
             val intent = Intent(applicationContext, ScannerActivity::class.java)
             startActivityForResult(intent, REQUEST_QR_SCAN)
         } else {
