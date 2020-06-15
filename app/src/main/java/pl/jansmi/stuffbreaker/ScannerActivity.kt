@@ -45,10 +45,10 @@ class ScannerActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
             if (database.boxes().findBoxByQrCode(result!!.text) != null ||
                 database.items().findItemByQrCode(result!!.text) != null
             ) {
-                sound.play(MediaActionSound.START_VIDEO_RECORDING)
-                v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
                 sound.play(MediaActionSound.STOP_VIDEO_RECORDING)
+                v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                sound.play(MediaActionSound.FOCUS_COMPLETE)
                 v.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 100, 100, 100), VibrationEffect.DEFAULT_AMPLITUDE))
             }
         }
