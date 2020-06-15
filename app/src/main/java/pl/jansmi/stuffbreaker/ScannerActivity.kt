@@ -1,13 +1,17 @@
 package pl.jansmi.stuffbreaker
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.media.MediaActionSound
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.Result
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import me.dm7.barcodescanner.zxing.ZXingScannerView
 import pl.jansmi.stuffbreaker.database.AppDatabase
+
 
 class ScannerActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
 
@@ -36,12 +40,16 @@ class ScannerActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
         if (shouldValidate) {
             val database = AppDatabase.getInstance(applicationContext)
             val sound = MediaActionSound()
+            val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
             if (database.boxes().findBoxByQrCode(result!!.text) != null ||
                 database.items().findItemByQrCode(result!!.text) != null
             ) {
                 sound.play(MediaActionSound.START_VIDEO_RECORDING)
+                v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
             } else {
                 sound.play(MediaActionSound.STOP_VIDEO_RECORDING)
+                v.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 100, 100, 100), VibrationEffect.DEFAULT_AMPLITUDE))
             }
         }
 
